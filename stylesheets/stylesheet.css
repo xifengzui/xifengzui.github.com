@@ -93,7 +93,7 @@ header h2 {
   width: 620px;
   margin: 0 auto;
 }
-
+.article_tit{text-align:center;font-size:30px;color:#000;}
 #container .inner img {
   max-width: 100%;
 }

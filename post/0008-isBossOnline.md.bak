@@ -1,0 +1,115 @@
+---
+title: "检查公司人员出勤状态"
+date: 2017-11-04T16:38:19+08:00
+draft: true
+---
+
+最近做了一个简单的脚本，用于检查公司人员是否在线。未来考虑可以增加更多的功能。
+
+由于公司的网络全部使用ip-mac地址映射。且全部挂在一个路由下。因此使用python写了个简单的脚本，原理很简单。
+先使用python-nmap进行ping扫描，扫描全公司的设备在线状态。然后根据ip与mac还有名字的联系。将在线名单整理出来。
+最后通过Python的BaseHttpServer建议个小的web站点。效果如下图：
+![已经永远离去的家猫](http://ojildssc5.bkt.clouddn.com/isBossOnline.png)
+
+python脚本如下，比较简单。其实可以做一些特征分析，比如某某某啥时候上班，啥时候下班，如果数据可视化就更好了。
+目前只是花了一点点时间折腾这种工具，所以内容都比较粗燥,现在工作比较忙。目的是熟悉语言，并且可以对员工的出勤时间有大概理解。
+
+```python
+#!/usr/bin/env python
+# this is a program detect boss online or not
+
+import nmap
+import json
+import BaseHTTPServer
+import SocketServer
+
+from BaseHTTPServer import HTTPServer
+nm = nmap.PortScanner()
+#handler = SimpleHTTPServer.SimpleHTTPRequestHandler
+
+#构建网页
+class SETHandler(BaseHTTPServer.BaseHTTPRequestHandler):
+    def _set_headers(self):
+        self.send_response(200)
+        self.send_header("Context-type",'text/html;charset=UTF-8')
+        self.end_headers()
+
+    def createHTML(self):
+        self.wfile.write("helloworld!")
+
+    def do_GET(self):
+        lineCnt = 0
+        listp = onlinePeople()
+        self._set_headers()
+        print self.headers
+        self.wfile.write("<html><head> <meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\"> </head><body>")
+        self.wfile.write("<h1 style=\"text-align:center\"> PEOPLE ON LINE!!!</h1><br/>")
+        self.wfile.write("<h4 style=\"text-align:justify\">")
+        for people in listp: 
+            if (len(people) > 2):
+                self.wfile.write(people[2])
+            else:
+            #    self.wfile.write(people[0])
+                continue
+            lineCnt = lineCnt+1
+            self.wfile.write("&nbsp;&nbsp;&nbsp;&nbsp;")
+            if(lineCnt%20 == 0):
+                self.wfile.write("<br/>")
+                self.wfile.write("<br/>")
+                
+        self.wfile.write("</h4>")
+        self.wfile.write("</body></html>")
+        
+    def do_HEAD(self):
+        self._set_headers()
+    def do_POST(self):
+        self._set_headers()
+        self.wfile.write("<html><body><h1>POST!</h1></body></html>")
+
+def run(server_class=HTTPServer, handler_class=SETHandler, port = 82):
+    server_address = ('', port)
+    httpd = server_class(server_address, handler_class)
+    print "start http server"
+    httpd.serve_forever()
+
+lanInfoPath ="."  
+def scanLan():
+    return nm.scan("192.168.1.0/24", arguments="-sP")
+
+#在线检查
+def OnlineIpList():
+    result = scanLan()
+    scanR =result['scan']
+    for t in range(2,255):
+        ip = '192.168.1.'+str(t)
+        if(ip in scanR.keys()):
+            yield ip
+
+def bossList():
+    fileObj = open("bossList.txt")
+    try:
+        allLine = fileObj.readlines()
+    finally:
+        fileObj.close()
+    return allLine
+
+def onlinePeople():
+    iplist = OnlineIpList()
+    filelines = bossList()
+    for ip in iplist:
+        for line in filelines:
+            peopleInfo = line.strip().split('\t')
+            if (ip == peopleInfo[0]):
+                yield peopleInfo
+
+
+
+if __name__ == "__main__":
+    from sys import argv
+        
+    if len(argv) == 2:
+        run(port=int(argv[1]))
+    else:
+        run()
+
+```

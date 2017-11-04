@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="generator" content="Hugo 0.30.2" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="fonts.lug.ustc.edu.cn/css?family=Roboto:400,700" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/github.min.css">
+<link rel="stylesheet" href="/css/normalize.css">
+<link rel="stylesheet" href="/css/skeleton.css">
+<link rel="stylesheet" href="/css/custom.css">
+<link rel="alternate" href="/index.xml" type="application/rss+xml" title="惜枫醉">
+<title>检查公司人员出勤状态 - 惜枫醉</title>
+</head>
+<body>
+
+<div class="container">
+
+	<header role="banner">
+		<div class="header-logo">
+			<a href="/"><img src="https://s.gravatar.com/avatar/45de30c48912968eb292222014b646e8?s=200" width="60" height="60" alt="惜枫醉"></a>
+		</div>
+		
+	</header>
+
+
+	<main role="main">
+		<article itemscope itemtype="http://schema.org/BlogPosting">
+			<h1 class="entry-title" itemprop="headline">检查公司人员出勤状态</h1>
+			<span class="entry-meta"><time itemprop="datePublished" datetime="2017-11-04">November 04, 2017</time></span>
+			<section itemprop="entry-text">
+				<p>最近做了一个简单的脚本，用于检查公司人员是否在线。未来考虑可以增加更多的功能。</p>
+
+<p>由于公司的网络全部使用ip-mac地址映射。且全部挂在一个路由下。因此使用python写了个简单的脚本，原理很简单。
+先使用python-nmap进行ping扫描，扫描全公司的设备在线状态。然后根据ip与mac还有名字的联系。将在线名单整理出来。
+最后通过Python的BaseHttpServer建议个小的web站点。效果如下图：
+<img src="http://ojildssc5.bkt.clouddn.com/isBossOnline.png" alt="已经永远离去的家猫" /></p>
+
+<p>python脚本如下，比较简单。其实可以做一些特征分析，比如某某某啥时候上班，啥时候下班，如果数据可视化就更好了。
+目前只是花了一点点时间折腾这种工具，所以内容都比较粗燥,现在工作比较忙。目的是熟悉语言，并且可以对员工的出勤时间有大概理解。</p>
+
+<pre><code class="language-python">#!/usr/bin/env python
+# this is a program detect boss online or not
+
+import nmap
+import json
+import BaseHTTPServer
+import SocketServer
+
+from BaseHTTPServer import HTTPServer
+nm = nmap.PortScanner()
+#handler = SimpleHTTPServer.SimpleHTTPRequestHandler
+
+#构建网页
+class SETHandler(BaseHTTPServer.BaseHTTPRequestHandler):
+    def _set_headers(self):
+        self.send_response(200)
+        self.send_header(&quot;Context-type&quot;,'text/html;charset=UTF-8')
+        self.end_headers()
+
+    def createHTML(self):
+        self.wfile.write(&quot;helloworld!&quot;)
+
+    def do_GET(self):
+        lineCnt = 0
+        listp = onlinePeople()
+        self._set_headers()
+        print self.headers
+        self.wfile.write(&quot;&lt;html&gt;&lt;head&gt; &lt;meta http-equiv=\&quot;content-type\&quot; content=\&quot;text/html; charset=UTF-8\&quot;&gt; &lt;/head&gt;&lt;body&gt;&quot;)
+        self.wfile.write(&quot;&lt;h1 style=\&quot;text-align:center\&quot;&gt; PEOPLE ON LINE!!!&lt;/h1&gt;&lt;br/&gt;&quot;)
+        self.wfile.write(&quot;&lt;h4 style=\&quot;text-align:justify\&quot;&gt;&quot;)
+        for people in listp: 
+            if (len(people) &gt; 2):
+                self.wfile.write(people[2])
+            else:
+            #    self.wfile.write(people[0])
+                continue
+            lineCnt = lineCnt+1
+            self.wfile.write(&quot;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&quot;)
+            if(lineCnt%20 == 0):
+                self.wfile.write(&quot;&lt;br/&gt;&quot;)
+                self.wfile.write(&quot;&lt;br/&gt;&quot;)
+                
+        self.wfile.write(&quot;&lt;/h4&gt;&quot;)
+        self.wfile.write(&quot;&lt;/body&gt;&lt;/html&gt;&quot;)
+        
+    def do_HEAD(self):
+        self._set_headers()
+    def do_POST(self):
+        self._set_headers()
+        self.wfile.write(&quot;&lt;html&gt;&lt;body&gt;&lt;h1&gt;POST!&lt;/h1&gt;&lt;/body&gt;&lt;/html&gt;&quot;)
+
+def run(server_class=HTTPServer, handler_class=SETHandler, port = 82):
+    server_address = ('', port)
+    httpd = server_class(server_address, handler_class)
+    print &quot;start http server&quot;
+    httpd.serve_forever()
+
+lanInfoPath =&quot;.&quot;  
+def scanLan():
+    return nm.scan(&quot;192.168.1.0/24&quot;, arguments=&quot;-sP&quot;)
+
+#在线检查
+def OnlineIpList():
+    result = scanLan()
+    scanR =result['scan']
+    for t in range(2,255):
+        ip = '192.168.1.'+str(t)
+        if(ip in scanR.keys()):
+            yield ip
+
+def bossList():
+    fileObj = open(&quot;bossList.txt&quot;)
+    try:
+        allLine = fileObj.readlines()
+    finally:
+        fileObj.close()
+    return allLine
+
+def onlinePeople():
+    iplist = OnlineIpList()
+    filelines = bossList()
+    for ip in iplist:
+        for line in filelines:
+            peopleInfo = line.strip().split('\t')
+            if (ip == peopleInfo[0]):
+                yield peopleInfo
+
+
+
+if __name__ == &quot;__main__&quot;:
+    from sys import argv
+        
+    if len(argv) == 2:
+        run(port=int(argv[1]))
+    else:
+        run()
+
+</code></pre>
+
+			</section>
+		</article>
+	</main>
+
+
+	<footer role="contentinfo">
+		<div class="hr"></div>
+		<div class="footer-link">
+			<a href="mailto:xifengzui@yeah.net" target="_blank">Email</a>
+			
+			
+			<a href="https://github.com/xifengzui" target="_blank">GitHub</a>
+			<a href="https://www.weibo.com/malermad" target="_blank">微博</a>
+			
+			<a href="/about" target="_blank">关于</a>
+		</div>
+		<div class="copyright">Copyright &copy; 惜枫醉 All rights reserved.</div>
+	</footer>
+
+</div>
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+</body>
+</html>

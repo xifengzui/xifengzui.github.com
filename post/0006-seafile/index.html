@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="generator" content="Hugo 0.30.2" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="fonts.lug.ustc.edu.cn/css?family=Roboto:400,700" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/github.min.css">
+<link rel="stylesheet" href="/css/normalize.css">
+<link rel="stylesheet" href="/css/skeleton.css">
+<link rel="stylesheet" href="/css/custom.css">
+<link rel="alternate" href="/index.xml" type="application/rss+xml" title="惜枫醉">
+<title>Seafile-可快速搭建的私有云方案 - 惜枫醉</title>
+</head>
+<body>
+
+<div class="container">
+
+	<header role="banner">
+		<div class="header-logo">
+			<a href="/"><img src="https://s.gravatar.com/avatar/45de30c48912968eb292222014b646e8?s=200" width="60" height="60" alt="惜枫醉"></a>
+		</div>
+		
+	</header>
+
+
+	<main role="main">
+		<article itemscope itemtype="http://schema.org/BlogPosting">
+			<h1 class="entry-title" itemprop="headline">Seafile-可快速搭建的私有云方案</h1>
+			<span class="entry-meta"><time itemprop="datePublished" datetime="2017-02-04">February 04, 2017</time></span>
+			<section itemprop="entry-text">
+				<p><img src="http://ojildssc5.bkt.clouddn.com/nasplusseafile.jpg" alt="" />
+最近百度网盘不要脸，限速、很多正版电影被和谐。
+而且网盘随时都有跑路的风险，可能导致几百GB数据不翼而飞(参考115网盘)。</p>
+
+<p>恰巧我也被一个事情给烦恼，手机只有32GB存储，稍微一拍照片，装一些app后，存储就满了。也因为老婆手机也只有32GB存储，还没满就开始抱怨存储可能不太够。
+作为爱折腾人士，总得想个办法解决以上问题，秉承自己的东西自己管的原则，个人决定找一个比较好的方案来实现自己家的“百度网盘”。</p>
+
+<p>*<strong><em>0.目标</em></strong>*</p>
+
+<p>a.实现类百度网盘或dropbox网盘的功能。
+b.数据存在家里的小型服务器(nas)上，不怕跑路而且安全，不会被莫名奇妙的共享出去。
+c.<strong>没有人来当你老爷并管你存了什么</strong>。
+d.实现互联网访问。
+e.<strong>有各个平台客户端可用</strong></p>
+
+<p>*<strong><em>1.确定实现方案</em></strong>*</p>
+
+<p>一番搜索后共发现两个方案，分别为
+<strong>owncloud</strong>
+owncloud是一款开源自架的文件同步和共享的平台软件。
+是老外开发一套家庭云盘服务方案。
+官网:<a href="https://owncloud.org/">https://owncloud.org/</a>
+提供了包括安卓，苹果，pc的客户端，还有网页直接访问，基本实现了网盘全部功能。</p>
+
+<p>优点:
+文件存储方式为目录，万一挂了，还能保证数据正常，懒得恢复的话还能顶几天。但一些人认为这不是优点，不能保证数据安全性。</p>
+
+<p>缺点：
+据知乎众人反馈，容易奔溃，而且有莫名其妙的bug.
+<strong>ios上客户端收费！</strong>
+安装麻烦，且文档全部英文。
+安装遇到问题时较难在互联网找到解决方案，会额外花费较多时间。
+只支持linux平台</p>
+
+<p><strong>seafile</strong>
+seafile是国人开发一款家庭云盘实现方案。名叫海文。
+官方网站: <a href="https://www.seafile.com/home/">https://www.seafile.com/home/</a></p>
+
+<p>优点：
+直接提供在windows下的安装包，如果你家里有闲置pc可以拿来装起来直接用。
+安装十分方便，有十分详尽的用户手册，而且文档是中文的，我安装只用了15分钟。
+文件以块方式加密，正如上面所说，有些人认为这不是优点，万一崩溃就没法用了。</p>
+
+<p>缺点:
+非企业版功能不是很多，但够用了。</p>
+
+<p>综上所述，选择seafile，觉得seafile对家里来说来说够用了。
+*<strong><em>2.安装</em></strong>*
+安装可以参考海文官方文档，写的太详细了，我觉得我再写一遍就有点啰嗦了，基本在linux敲几行命令就好了。
+可以参考:<a href="https://manual-cn.seafile.com/">https://manual-cn.seafile.com/</a></p>
+
+<p>互联网映射需要你家里的路由支持ddns及有公网IP地址，实现以上几点就可以设置端口映射了，具体可以参考海文官方手册，很详细讲到。</p>
+
+<p>*<strong><em>3.使用</em></strong>*
+手机，电脑在appstore或各大安卓商店或访问官网，得到app，安装，然后添加你家里的服务器就好了。
+手机端看起来长这样
+<img src="http://ojildssc5.bkt.clouddn.com/img-camera-upload.jpg" alt="" /></p>
+
+<p><img src="http://ojildssc5.bkt.clouddn.com/seting-seafile.jpg" alt="" />
+网页端看起来长这样</p>
+
+<p><img src="http://ojildssc5.bkt.clouddn.com/seafile-website.jpg" alt="" />
+怎么样，是不是和百度网盘差不多？</p>
+
+<p><strong>运行环境</strong>
+debian8 x64</p>
+
+<p>家里的nas</p>
+
+			</section>
+		</article>
+	</main>
+
+
+	<footer role="contentinfo">
+		<div class="hr"></div>
+		<div class="footer-link">
+			<a href="mailto:xifengzui@yeah.net" target="_blank">Email</a>
+			
+			
+			<a href="https://github.com/xifengzui" target="_blank">GitHub</a>
+			<a href="https://www.weibo.com/malermad" target="_blank">微博</a>
+			
+			<a href="/about" target="_blank">关于</a>
+		</div>
+		<div class="copyright">Copyright &copy; 惜枫醉 All rights reserved.</div>
+	</footer>
+
+</div>
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+</body>
+</html>

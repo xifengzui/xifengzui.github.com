@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Leanote on 惜枫醉</title>
+    <link>http://arkis.me/tags/leanote/</link>
+    <description>Recent content in Leanote on 惜枫醉</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-CN</language>
+    <copyright>惜枫醉 All rights reserved.</copyright>
+    <lastBuildDate>Sun, 12 Feb 2017 20:13:41 +0000</lastBuildDate>
+    
+	<atom:link href="http://arkis.me/tags/leanote/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>leanote-私人的云笔记</title>
+      <link>http://arkis.me/post/0007-leannote/</link>
+      <pubDate>Sun, 12 Feb 2017 20:13:41 +0000</pubDate>
+      
+      <guid>http://arkis.me/post/0007-leannote/</guid>
+      <description>最近思考资料多的情况下如何做到多电脑同步，考虑使用一款云笔记app。奈何网络上各种云笔记基本不是收费就是速度慢，要么功能限制，不能够多app同步。个人希望能够有一款云笔记，能够做到云笔记的一切，而且也有各个平台的app，能实时同步我的笔记。趁放假，今天花了一些时间在Github及其他平台上搜索了下，发现了蚂蚁笔记-leanote，它是一款开源云笔记，而且能够支持私有云搭建，同时也是国人开发的一款云笔记。大家可以浏览其官网 www.leanote.com 得到更多信息 这个笔记软件提供了包括windows ios linux mac全平台的应用。并且提供了linux端的服务端程序，如果有一定的linux基础，可以尝试使用服务端程序用在你自己的生产环境种。笔记服务端可以部署在公司局域网，或自己的nas上，奕可以开放到公共的网络上，提供大家注册使用。或者直接下载人家提供的windows版本服务程序安装。如果懒得弄也没关系，可以尝试试用下人家提供的服务，还是相当不错的，可以支持下。
+个人搭载在自己的NAS linux服务器上，并且开发了公网访问，让我随时随地可以在各个地方使用服务，主要是免费可以获得所有功能，并且资料在自己这里，不说稳定，至少安全。
+服务端安装 你可以访问leanote Github(EN) 直接获得操作说明
+我的安装方式是直接获取x86bin安装，省略编译过程，如果您是其他处理器平台，请直接获取源代码安装。可以参考 [源代码安装说明(EN)](https://github.com/leanote/leanote/wiki/Leanote-source-installation-on-Mac-and-Linux-(En) 从此页面获得安装包 http://leanote.org/#download
+下面是从bin安装的过程
+我们暂定把/home/user 目录作为安装目录
+$ cd /home/user $ wget https://jaist.dl.sourceforge.net/project/leanote-bin/2.3/leanote-linux-amd64-v2.3.bin.tar.gz $ tar -zxvf leanote-linux-amd64-v2.3.bin.tar.gz  binary解压完毕，准备下数据库 mongodb,我们假定安装在/opt/mongodb目录
+$ wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-3.0.1.tgz $ tar-zxvf mongodb-linux-x86_64-3.0.1.tgz $ mv mongodb-linux-x86_64-3.0.1 /opt/mongodb  记得讲解压的东西全部拷贝到 现在我们把mongodb放到环境变量
+$vim /etc/profile export PATH=$PATH:/home/user1/mongodb/bin  让变量生效
+$ source /etc/profile  测试下安装情况，在你的数据存储目录下，先建立一个存数据的文件夹，再在里边敲入测试命令
+$ mkdir /home/user/data $ mongod --dbpath /home/user/data &amp;amp;  现在可以测试mongod的情况了
+$mongo &amp;gt;show dbs  如果打印正常，那么就走到下一步，把leanote链到你的数据库</description>
+    </item>
+    
+  </channel>
+</rss>

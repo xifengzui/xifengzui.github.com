@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Seafile on 惜枫醉</title>
+    <link>http://arkis.me/tags/seafile/</link>
+    <description>Recent content in Seafile on 惜枫醉</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-CN</language>
+    <copyright>惜枫醉 All rights reserved.</copyright>
+    <lastBuildDate>Sat, 04 Feb 2017 20:05:28 +0000</lastBuildDate>
+    
+	<atom:link href="http://arkis.me/tags/seafile/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Seafile-可快速搭建的私有云方案</title>
+      <link>http://arkis.me/post/0006-seafile/</link>
+      <pubDate>Sat, 04 Feb 2017 20:05:28 +0000</pubDate>
+      
+      <guid>http://arkis.me/post/0006-seafile/</guid>
+      <description>最近百度网盘不要脸，限速、很多正版电影被和谐。 而且网盘随时都有跑路的风险，可能导致几百GB数据不翼而飞(参考115网盘)。
+恰巧我也被一个事情给烦恼，手机只有32GB存储，稍微一拍照片，装一些app后，存储就满了。也因为老婆手机也只有32GB存储，还没满就开始抱怨存储可能不太够。 作为爱折腾人士，总得想个办法解决以上问题，秉承自己的东西自己管的原则，个人决定找一个比较好的方案来实现自己家的“百度网盘”。
+*0.目标*
+a.实现类百度网盘或dropbox网盘的功能。 b.数据存在家里的小型服务器(nas)上，不怕跑路而且安全，不会被莫名奇妙的共享出去。 c.没有人来当你老爷并管你存了什么。 d.实现互联网访问。 e.有各个平台客户端可用
+*1.确定实现方案*
+一番搜索后共发现两个方案，分别为 owncloud owncloud是一款开源自架的文件同步和共享的平台软件。 是老外开发一套家庭云盘服务方案。 官网:https://owncloud.org/ 提供了包括安卓，苹果，pc的客户端，还有网页直接访问，基本实现了网盘全部功能。
+优点: 文件存储方式为目录，万一挂了，还能保证数据正常，懒得恢复的话还能顶几天。但一些人认为这不是优点，不能保证数据安全性。
+缺点： 据知乎众人反馈，容易奔溃，而且有莫名其妙的bug. ios上客户端收费！ 安装麻烦，且文档全部英文。 安装遇到问题时较难在互联网找到解决方案，会额外花费较多时间。 只支持linux平台
+seafile seafile是国人开发一款家庭云盘实现方案。名叫海文。 官方网站: https://www.seafile.com/home/
+优点： 直接提供在windows下的安装包，如果你家里有闲置pc可以拿来装起来直接用。 安装十分方便，有十分详尽的用户手册，而且文档是中文的，我安装只用了15分钟。 文件以块方式加密，正如上面所说，有些人认为这不是优点，万一崩溃就没法用了。
+缺点: 非企业版功能不是很多，但够用了。
+综上所述，选择seafile，觉得seafile对家里来说来说够用了。 *2.安装* 安装可以参考海文官方文档，写的太详细了，我觉得我再写一遍就有点啰嗦了，基本在linux敲几行命令就好了。 可以参考:https://manual-cn.seafile.com/
+互联网映射需要你家里的路由支持ddns及有公网IP地址，实现以上几点就可以设置端口映射了，具体可以参考海文官方手册，很详细讲到。
+*3.使用* 手机，电脑在appstore或各大安卓商店或访问官网，得到app，安装，然后添加你家里的服务器就好了。 手机端看起来长这样 网页端看起来长这样
+怎么样，是不是和百度网盘差不多？
+运行环境 debian8 x64
+家里的nas</description>
+    </item>
+    
+  </channel>
+</rss>

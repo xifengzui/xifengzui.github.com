@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>因缺斯汀 on 惜枫醉</title>
+    <link>http://arkis.me/tags/%E5%9B%A0%E7%BC%BA%E6%96%AF%E6%B1%80/</link>
+    <description>Recent content in 因缺斯汀 on 惜枫醉</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-CN</language>
+    <copyright>惜枫醉 All rights reserved.</copyright>
+    <lastBuildDate>Sun, 15 Jan 2017 13:28:35 +0000</lastBuildDate>
+    
+	<atom:link href="http://arkis.me/tags/%E5%9B%A0%E7%BC%BA%E6%96%AF%E6%B1%80/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>TheFuck-linux错误指令纠正工具</title>
+      <link>http://arkis.me/post/0004-thefuck/</link>
+      <pubDate>Sun, 15 Jan 2017 13:28:35 +0000</pubDate>
+      
+      <guid>http://arkis.me/post/0004-thefuck/</guid>
+      <description>偶然在搜软件包的时候，某人发了一张他的软件安装包的升级图。突然看到了一个神奇的项目
+来了性趣，跑到github上一看，确实有这么个奇葩名称的项目。
+thefuck: https://github.com/nvbn/thefuck
+Magnificent app which corrects your previous console command, inspired by a @liamosaur tweet.
+一个碉堡的APP，帮你修正刚敲错的命令。
+基本操作方法就是，敲错命令了? 没关系，再敲个fuck，自动帮你修复前面的指令错误。
+作者还是一个俄罗斯毛子
+&amp;hellip;
+这么好的东西，怎么能不装起来呢。
+$sudo apt-get install python3-dev python3-pip $pip3 install thefuck  好了装完了。 &amp;hellip;
+执行环境是debian8 x64 家里的nas </description>
+    </item>
+    
+  </channel>
+</rss>

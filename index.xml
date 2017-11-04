@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>惜枫醉</title>
+    <link>http://arkis.me/</link>
+    <description>Recent content on 惜枫醉</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-CN</language>
+    <copyright>惜枫醉 All rights reserved.</copyright>
+    <lastBuildDate>Wed, 31 May 2017 20:46:38 +0000</lastBuildDate>
+    
+	<atom:link href="http://arkis.me/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Garage2Arduino-自己搭建的车库语音控制器方案</title>
+      <link>http://arkis.me/post/0003-garagecontroler/</link>
+      <pubDate>Wed, 31 May 2017 20:46:38 +0000</pubDate>
+      
+      <guid>http://arkis.me/post/0003-garagecontroler/</guid>
+      <description>开源项目地址
+有一次出差，家里没人，被锁在外面了。自己还没钥匙。在大门外晒了半小时太阳。于是想到要是能用手机控制家里的车库进去该多好。有想法就要有行动。网上查一下现有的方案。现有方案基本都是开开关，车库控制器基本没有。鉴于自己使用iphone，肯定是考虑homekit系列产品淘宝了一圈，似乎没有类似产品。那就自己做解决需求。最终实现的效果可以参考我的视频。
+ 对了，我这里还有打样多的几块裸板，如果你有需求，可以发我一个地址，到付。
+下面是啰嗦的实现过程，如果你有兴趣也制作一个自己的车库控制器，可以参考下，如果没兴趣就不要看了。
+1.技术难度分析
+我们要实现语音控制，需要苹果官方API支持，而恰好，在gayhub上有一个开源项目名叫homeBridge,是国外黑客们逆向苹果homekit的成果，让大家可以通过苹果控制第三方设备。
+不得不说开源大法好。首先我们需要了解这个开源项目的可用性。
+这是官方简介：
+Homebridge is a lightweight NodeJS server you can run on your home network that emulates the iOS HomeKit API. It supports Plugins, which are community-contributed modules that provide a basic bridge from HomeKit to various 3rd-party APIs provided by manufacturers of &amp;ldquo;smart home&amp;rdquo; devices.
+Since Siri supports devices added through HomeKit, this means that with Homebridge you can ask Siri to control devices that don&amp;rsquo;t have any support for HomeKit at all.</description>
+    </item>
+    
+    <item>
+      <title>leanote-私人的云笔记</title>
+      <link>http://arkis.me/post/0007-leannote/</link>
+      <pubDate>Sun, 12 Feb 2017 20:13:41 +0000</pubDate>
+      
+      <guid>http://arkis.me/post/0007-leannote/</guid>
+      <description>最近思考资料多的情况下如何做到多电脑同步，考虑使用一款云笔记app。奈何网络上各种云笔记基本不是收费就是速度慢，要么功能限制，不能够多app同步。个人希望能够有一款云笔记，能够做到云笔记的一切，而且也有各个平台的app，能实时同步我的笔记。趁放假，今天花了一些时间在Github及其他平台上搜索了下，发现了蚂蚁笔记-leanote，它是一款开源云笔记，而且能够支持私有云搭建，同时也是国人开发的一款云笔记。大家可以浏览其官网 www.leanote.com 得到更多信息 这个笔记软件提供了包括windows ios linux mac全平台的应用。并且提供了linux端的服务端程序，如果有一定的linux基础，可以尝试使用服务端程序用在你自己的生产环境种。笔记服务端可以部署在公司局域网，或自己的nas上，奕可以开放到公共的网络上，提供大家注册使用。或者直接下载人家提供的windows版本服务程序安装。如果懒得弄也没关系，可以尝试试用下人家提供的服务，还是相当不错的，可以支持下。
+个人搭载在自己的NAS linux服务器上，并且开发了公网访问，让我随时随地可以在各个地方使用服务，主要是免费可以获得所有功能，并且资料在自己这里，不说稳定，至少安全。
+服务端安装 你可以访问leanote Github(EN) 直接获得操作说明
+我的安装方式是直接获取x86bin安装，省略编译过程，如果您是其他处理器平台，请直接获取源代码安装。可以参考 [源代码安装说明(EN)](https://github.com/leanote/leanote/wiki/Leanote-source-installation-on-Mac-and-Linux-(En) 从此页面获得安装包 http://leanote.org/#download
+下面是从bin安装的过程
+我们暂定把/home/user 目录作为安装目录
+$ cd /home/user $ wget https://jaist.dl.sourceforge.net/project/leanote-bin/2.3/leanote-linux-amd64-v2.3.bin.tar.gz $ tar -zxvf leanote-linux-amd64-v2.3.bin.tar.gz  binary解压完毕，准备下数据库 mongodb,我们假定安装在/opt/mongodb目录
+$ wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-3.0.1.tgz $ tar-zxvf mongodb-linux-x86_64-3.0.1.tgz $ mv mongodb-linux-x86_64-3.0.1 /opt/mongodb  记得讲解压的东西全部拷贝到 现在我们把mongodb放到环境变量
+$vim /etc/profile export PATH=$PATH:/home/user1/mongodb/bin  让变量生效
+$ source /etc/profile  测试下安装情况，在你的数据存储目录下，先建立一个存数据的文件夹，再在里边敲入测试命令
+$ mkdir /home/user/data $ mongod --dbpath /home/user/data &amp;amp;  现在可以测试mongod的情况了
+$mongo &amp;gt;show dbs  如果打印正常，那么就走到下一步，把leanote链到你的数据库</description>
+    </item>
+    
+    <item>
+      <title>公牛WiFi智能插座2代</title>
+      <link>http://arkis.me/post/0005-gongniu/</link>
+      <pubDate>Sun, 12 Feb 2017 19:01:50 +0000</pubDate>
+      
+      <guid>http://arkis.me/post/0005-gongniu/</guid>
+      <description>1.看起来就是一个插座
+总的来说，公牛这款插座和其他公牛产的插座一样，外壳外观质量没得说，塑料材质非常好。公牛在插座质量方面没得说。 正面共带两种国标的插座孔。
+对外提示方面总共有两个一个是指示灯,在插座面板的左上方，有两总颜色，没连上wifi或没有初始化的时候，会不停闪烁。 还有就是侧面的开关按钮，避免没连上wifi的时候没办法开关
+2.让我来教你怎么初始化
+手机上装一个阿里智能 app，然后点击分类查找-找到设备名称，输入wifi密码，app会自动的找到设备并且让设备接入到家里的wifi。这点我觉得阿里做的还是非常不错的，不像有些智能家居在初始化操作上非常麻烦，在这点上要表扬，很方便。 3.好，开关怎么用
+遥控开关啊！ 开开关关啦！
+还有几个就是定时开关，还有很多模式，什么热水器模式，延时模式&amp;hellip;&amp;hellip;
+和市面上买的那种定时开关差不多，不同的是这东西能遥控，不仅家里能遥控，你无聊还能跑到美利坚去遥控&amp;hellip;.
+4.阿里工程师偷懒了
+基本上开关就这些东西了，如果你问我还有什么&amp;hellip;&amp;hellip;我觉得，阿里声控这块是我不会呢还是人家压根就没做呢。 我设置了名字后，基本叫不醒。 综上，等于是家里多了一个用手机遥控的开关&amp;hellip;..
+还有，这遥控开关还能升级，还有遥控开关官方要80块钱&amp;hellip;.</description>
+    </item>
+    
+    <item>
+      <title>Seafile-可快速搭建的私有云方案</title>
+      <link>http://arkis.me/post/0006-seafile/</link>
+      <pubDate>Sat, 04 Feb 2017 20:05:28 +0000</pubDate>
+      
+      <guid>http://arkis.me/post/0006-seafile/</guid>
+      <description>最近百度网盘不要脸，限速、很多正版电影被和谐。 而且网盘随时都有跑路的风险，可能导致几百GB数据不翼而飞(参考115网盘)。
+恰巧我也被一个事情给烦恼，手机只有32GB存储，稍微一拍照片，装一些app后，存储就满了。也因为老婆手机也只有32GB存储，还没满就开始抱怨存储可能不太够。 作为爱折腾人士，总得想个办法解决以上问题，秉承自己的东西自己管的原则，个人决定找一个比较好的方案来实现自己家的“百度网盘”。
+*0.目标*
+a.实现类百度网盘或dropbox网盘的功能。 b.数据存在家里的小型服务器(nas)上，不怕跑路而且安全，不会被莫名奇妙的共享出去。 c.没有人来当你老爷并管你存了什么。 d.实现互联网访问。 e.有各个平台客户端可用
+*1.确定实现方案*
+一番搜索后共发现两个方案，分别为 owncloud owncloud是一款开源自架的文件同步和共享的平台软件。 是老外开发一套家庭云盘服务方案。 官网:https://owncloud.org/ 提供了包括安卓，苹果，pc的客户端，还有网页直接访问，基本实现了网盘全部功能。
+优点: 文件存储方式为目录，万一挂了，还能保证数据正常，懒得恢复的话还能顶几天。但一些人认为这不是优点，不能保证数据安全性。
+缺点： 据知乎众人反馈，容易奔溃，而且有莫名其妙的bug. ios上客户端收费！ 安装麻烦，且文档全部英文。 安装遇到问题时较难在互联网找到解决方案，会额外花费较多时间。 只支持linux平台
+seafile seafile是国人开发一款家庭云盘实现方案。名叫海文。 官方网站: https://www.seafile.com/home/
+优点： 直接提供在windows下的安装包，如果你家里有闲置pc可以拿来装起来直接用。 安装十分方便，有十分详尽的用户手册，而且文档是中文的，我安装只用了15分钟。 文件以块方式加密，正如上面所说，有些人认为这不是优点，万一崩溃就没法用了。
+缺点: 非企业版功能不是很多，但够用了。
+综上所述，选择seafile，觉得seafile对家里来说来说够用了。 *2.安装* 安装可以参考海文官方文档，写的太详细了，我觉得我再写一遍就有点啰嗦了，基本在linux敲几行命令就好了。 可以参考:https://manual-cn.seafile.com/
+互联网映射需要你家里的路由支持ddns及有公网IP地址，实现以上几点就可以设置端口映射了，具体可以参考海文官方手册，很详细讲到。
+*3.使用* 手机，电脑在appstore或各大安卓商店或访问官网，得到app，安装，然后添加你家里的服务器就好了。 手机端看起来长这样 网页端看起来长这样
+怎么样，是不是和百度网盘差不多？
+运行环境 debian8 x64
+家里的nas</description>
+    </item>
+    
+    <item>
+      <title>TheFuck-linux错误指令纠正工具</title>
+      <link>http://arkis.me/post/0004-thefuck/</link>
+      <pubDate>Sun, 15 Jan 2017 13:28:35 +0000</pubDate>
+      
+      <guid>http://arkis.me/post/0004-thefuck/</guid>
+      <description>偶然在搜软件包的时候，某人发了一张他的软件安装包的升级图。突然看到了一个神奇的项目
+来了性趣，跑到github上一看，确实有这么个奇葩名称的项目。
+thefuck: https://github.com/nvbn/thefuck
+Magnificent app which corrects your previous console command, inspired by a @liamosaur tweet.
+一个碉堡的APP，帮你修正刚敲错的命令。
+基本操作方法就是，敲错命令了? 没关系，再敲个fuck，自动帮你修复前面的指令错误。
+作者还是一个俄罗斯毛子
+&amp;hellip;
+这么好的东西，怎么能不装起来呢。
+$sudo apt-get install python3-dev python3-pip $pip3 install thefuck  好了装完了。 &amp;hellip;
+执行环境是debian8 x64 家里的nas </description>
+    </item>
+    
+    <item>
+      <title>博客转移</title>
+      <link>http://arkis.me/post/0001-blogtransfer/</link>
+      <pubDate>Sun, 08 Jan 2017 21:42:46 +0000</pubDate>
+      
+      <guid>http://arkis.me/post/0001-blogtransfer/</guid>
+      <description>最近搬瓦工因为不可描述的原因官网已经不能够直接访问了。国外的服务器原来的站点我怕续命不能，开始慢慢转移到国内。
+国内其实服务器普遍偏贵。3刀一年我估计是不会有了,搬瓦工的服务器运气好能抢到一些3刀一年的。感谢conding.net的无私贡献，现在blog改名从冗长的xifengzui.com 改为arkis.me。个人主搞嵌入式C\C++，所架设资源均来自开源社区github里的人的无私贡献，感谢。 博客架设从wordpress改为了hexo，书写方式也从普通的编辑手段改为了markdown，讲真markdown效率超高。以后内容也会慢慢的从xifengzui.com转移到此处。</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="/css/skeleton.css">
 <link rel="stylesheet" href="/css/custom.css">
 <link rel="alternate" href="/index.xml" type="application/rss+xml" title="惜枫醉">
-<title>公牛WiFi智能插座2代 - 惜枫醉</title>
+<title>Hugo博客 优酷视频的改善-修复长宽问题 - 惜枫醉</title>
 </head>
 <body>
 
@@ -26,8 +26,8 @@
 
 	<main role="main">
 		<article itemscope itemtype="http://schema.org/BlogPosting">
-			<h1 class="entry-title" itemprop="headline">公牛WiFi智能插座2代</h1>
-			<span class="entry-meta"><time itemprop="datePublished" datetime="2017-02-12">2017年02月12日</time></span>
+			<h1 class="entry-title" itemprop="headline">Hugo博客 优酷视频的改善-修复长宽问题</h1>
+			<span class="entry-meta"><time itemprop="datePublished" datetime="2017-11-06">2017年11月06日</time></span>
 			<section itemprop="entry-text">
 				<script type="text/javascript">	
 					
@@ -43,45 +43,31 @@
 						}
 					}
 				</script>
-				<p><strong>1.看起来就是一个插座</strong></p>
+				<p>最近开始转用hugo进行个人博客的编写了。由于本人是个视频拍摄爱好者。经常会有一些个人剪辑作品发布。因此就需要在站点上嵌入视频。
+问题是国内的这几家视频商，嵌入页面压根就没好好搞。而hugo原生不支持优酷，没办法只有自己想办法来优化。其实说是优化倒不如说是解决iframe的长宽比问题,曾考虑用CSS解决问题，但貌似CSS不支持动态高度。所以解决办法如下。</p>
 
-<p><img src="http://ojildssc5.bkt.clouddn.com/gnzncz1.png" alt="概览" />
-总的来说，公牛这款插座和其他公牛产的插座一样，外壳外观质量没得说，塑料材质非常好。公牛在插座质量方面没得说。
-正面共带两种国标的插座孔。</p>
+<p>首先我们需要理解 HUGO基于模板的运作方式。<br />
+所有文章内容都依赖于本文所用到的single模板。可以简单理解为，我把所有文章的字全部套上模板进行生成。基于这点我们就可以对统一的优酷外链下手。即一旦检测到优酷外链视频iframe模板。我们就用比较简单粗暴的方式进行参数修改。
+举个例子</p>
 
-<p>对外提示方面总共有两个一个是指示灯,在插座面板的左上方，有两总颜色，没连上wifi或没有初始化的时候，会不停闪烁。
-<img src="http://ojildssc5.bkt.clouddn.com/gnzncz2.jpg" alt="指示灯" /></p>
+<pre><code class="language-html">    &lt;iframe height=498 width=510 src='http://player.youku.com/embed/XMTI1OTQ0MTIwNA==' frameborder=0 allowfullscreen&gt;&lt;/iframe&gt;
+</code></pre>
 
-<p>还有就是侧面的开关按钮，避免没连上wifi的时候没办法开关</p>
+<p>2.在window.onload和onResize的时候对视频的长宽进行修改。<br />
+如上，宽高按照优酷的方式，排版难看。因此我用了比较简单的方式进行内容修改。即探测到iframe标签立即进行宽高修改。</p>
 
-<p><img src="http://ojildssc5.bkt.clouddn.com/gnzncz3.jpg" alt="开关按钮" /></p>
+<pre><code class="language-javascript">    window.onload = window.onresize = function () 
+    {
+        for(var ilength=0;ilength&lt;=document.getElementsByTagName(&quot;iframe&quot;).length;ilength++){
+            document.getElementsByTagName(&quot;iframe&quot;)[ilength].width = &quot;100%&quot;;
+            document.getElementsByTagName(&quot;iframe&quot;)[ilength].height = 
+                document.getElementsByTagName(&quot;iframe&quot;)[ilength].scrollWidth*9/16+&quot;px&quot;;//设定高度
+            document.getElementsByTagName(&quot;iframe&quot;)[ilength].style=&quot;border-radius: 10px;overflow: hidden;&quot;;
+        }
+    }
+</code></pre>
 
-<p><strong>2.让我来教你怎么初始化</strong></p>
-
-<p>手机上装一个<strong>阿里智能</strong> app，然后点击分类查找-找到设备名称，输入wifi密码，app会自动的找到设备并且让设备接入到家里的wifi。这点我觉得阿里做的还是非常不错的，不像有些智能家居在初始化操作上非常麻烦，在这点上要表扬，很方便。
-<img src="http://ojildssc5.bkt.clouddn.com/gnzncz4.jpg" alt="app" />
-<img src="http://ojildssc5.bkt.clouddn.com/gnzncz5.jpg" alt="操作面板" /></p>
-
-<p><strong>3.好，开关怎么用</strong></p>
-
-<p>遥控开关啊！  开开关关啦！</p>
-
-<p>还有几个就是定时开关，还有很多模式，什么热水器模式，延时模式&hellip;&hellip;</p>
-
-<p>和市面上买的那种定时开关差不多，不同的是这东西能遥控，不仅家里能遥控，你无聊还能跑到美利坚去遥控&hellip;.</p>
-
-<p><img src="http://ojildssc5.bkt.clouddn.com/IMG_0479.PNG" alt="控制面板" /></p>
-
-<p><strong>4.阿里工程师偷懒了</strong></p>
-
-<p>基本上开关就这些东西了，如果你问我还有什么&hellip;&hellip;我觉得，阿里声控这块是我不会呢还是人家压根就没做呢。
-我设置了名字后，基本叫不醒。
-<img src="http://ojildssc5.bkt.clouddn.com/IMG_0484.PNG" alt="我好像不明白1" />
-<img src="http://ojildssc5.bkt.clouddn.com/IMG_0483.PNG" alt="我好像不明白2" /></p>
-
-<p>综上，等于是家里多了一个用手机遥控的开关&hellip;..</p>
-
-<p>还有，这遥控开关还能升级，还有遥控开关官方要80块钱&hellip;.</p>
+<p>这样每次载入页面或者页面发生修改时，优酷播放器的长宽比就会发生变化。相对来说会美观很多。</p>
 
 
 				<span class="ref-txt">原创文章，如需转载引用请注明 "本文章首发于惜枫醉的个人博客: http://arkis.me"</span>

@@ -7,10 +7,24 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-CN</language>
     <copyright>惜枫醉 All rights reserved.</copyright>
-    <lastBuildDate>Sat, 04 Nov 2017 16:38:19 +0800</lastBuildDate>
+    <lastBuildDate>Mon, 06 Nov 2017 19:51:52 +0800</lastBuildDate>
     
 	<atom:link href="http://arkis.me/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Hugo博客 优酷视频的改善-修复长宽问题</title>
+      <link>http://arkis.me/post/0009-hugoyouku/</link>
+      <pubDate>Mon, 06 Nov 2017 19:51:52 +0800</pubDate>
+      
+      <guid>http://arkis.me/post/0009-hugoyouku/</guid>
+      <description>最近开始转用hugo进行个人博客的编写了。由于本人是个视频拍摄爱好者。经常会有一些个人剪辑作品发布。因此就需要在站点上嵌入视频。 问题是国内的这几家视频商，嵌入页面压根就没好好搞。而hugo原生不支持优酷，没办法只有自己想办法来优化。其实说是优化倒不如说是解决iframe的长宽比问题,曾考虑用CSS解决问题，但貌似CSS不支持动态高度。所以解决办法如下。
+首先我们需要理解 HUGO基于模板的运作方式。
+所有文章内容都依赖于本文所用到的single模板。可以简单理解为，我把所有文章的字全部套上模板进行生成。基于这点我们就可以对统一的优酷外链下手。即一旦检测到优酷外链视频iframe模板。我们就用比较简单粗暴的方式进行参数修改。 举个例子
+&amp;lt;iframe height=498 width=510 src=&#39;http://player.youku.com/embed/XMTI1OTQ0MTIwNA==&#39; frameborder=0 allowfullscreen&amp;gt;&amp;lt;/iframe&amp;gt;  2.在window.onload和onResize的时候对视频的长宽进行修改。
+如上，宽高按照优酷的方式，排版难看。因此我用了比较简单的方式进行内容修改。即探测到iframe标签立即进行宽高修改。
+window.onload = window.onresize = function () { for(var ilength=0;ilength&amp;lt;=document.getElementsByTagName(&amp;quot;iframe&amp;quot;).length;ilength++){ document.getElementsByTagName(&amp;quot;iframe&amp;quot;)[ilength].width = &amp;quot;100%&amp;quot;; document.getElementsByTagName(&amp;quot;iframe&amp;quot;)[ilength].height = document.getElementsByTagName(&amp;quot;iframe&amp;quot;)[ilength].scrollWidth*9/16+&amp;quot;px&amp;quot;;//设定高度 document.getElementsByTagName(&amp;quot;iframe&amp;quot;)[ilength].style=&amp;quot;border-radius: 10px;overflow: hidden;&amp;quot;; } }  这样每次载入页面或者页面发生修改时，优酷播放器的长宽比就会发生变化。相对来说会美观很多。</description>
+    </item>
     
     <item>
       <title>检查公司人员出勤状态</title>

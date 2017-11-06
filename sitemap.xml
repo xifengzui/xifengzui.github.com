@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>http://arkis.me/post/0009-hugoyouku/</loc>
+    <lastmod>2017-11-06T19:51:52+08:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://arkis.me/post/0008-isbossonline/</loc>
     <lastmod>2017-11-04T16:38:19+08:00</lastmod>
   </url>
@@ -73,7 +78,7 @@
   
   <url>
     <loc>http://arkis.me/post/</loc>
-    <lastmod>2017-11-04T16:38:19+08:00</lastmod>
+    <lastmod>2017-11-06T19:51:52+08:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -103,7 +108,7 @@
   
   <url>
     <loc>http://arkis.me/</loc>
-    <lastmod>2017-11-04T16:38:19+08:00</lastmod>
+    <lastmod>2017-11-06T19:51:52+08:00</lastmod>
     <priority>0</priority>
   </url>
   

@@ -67,12 +67,10 @@
 
 <p>然后在正文中调用，这就是官方推荐的模板调用形式。注意引号，避免问题。</p>
 
-<pre><code><iframe   class="iframe-video" src='http://player.youku.com/embed/XMTI1OTQ0MTIwNA==' frameborder=0 allowfullscreen onload="javascript:this.height = this.scrollWidth*9/16+'px';">
-</iframe>
-
+<pre><code class="language-html">{去掉{&lt; youku &quot;XMTI1OTQ0MTIwNA==&quot; &gt;}去掉}
 </code></pre>
 
-<p>这样就解决问题了。hugo为我们提供了一套完备的模板方案，我们可以指定一段短代码来代替一整段代码。如上我用shortcode对优酷的代码进行了整合。所有优酷的代码只需要一个视频尾巴信息就够了。这就是模板的强大之处。我只是借助模板之力顺便解决了iframe的问题。</p>
+<p>这样就解决问题了,记得把上述中文字去掉，hugo似乎看到标签立即替换，我也很无奈。hugo为我们提供了一套完备的模板方案，我们可以指定一段短代码来代替一整段代码。如上我用shortcode对优酷的代码进行了整合。所有优酷的代码只需要一个视频尾巴信息就够了。这就是模板的强大之处。我只是借助模板之力顺便解决了iframe的问题。</p>
 
 <p>如果你也想自己编写hugo的模板，请参考hugo的官方文档 <a href="http://gohugo.io/templates/shortcode-templates/">http://gohugo.io/templates/shortcode-templates/</a></p>
 

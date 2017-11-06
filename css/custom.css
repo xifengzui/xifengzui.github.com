@@ -107,8 +107,8 @@ main {
 	margin-top: 80px;
 }
 #donate_guide{
-	height: 210px;
-	width: 420px;
+	height: auto;
+	width: auto;
 	margin: 0 auto;
 }
 #donate_guide img{

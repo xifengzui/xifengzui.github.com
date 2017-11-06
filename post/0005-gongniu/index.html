@@ -69,6 +69,32 @@
 
 <p>还有，这遥控开关还能升级，还有遥控开关官方要80块钱&hellip;.</p>
 
+				
+				<div class ="post-donate">
+
+					<div id="donate_board" class="donate_bar center">
+						<a id="btn_donate" class="btn_donate" href="javascript:;" title="打赏"></a>
+						<span class="donate_txt">
+						   喜欢本文章就打赏一个吧
+						</span>
+						<br>
+					</div>
+
+					<div id="donate_guide" class="donate_bar center hidden" >
+						
+						<img src="http://ojildssc5.bkt.clouddn.com/alipay_commit.jpg" alt="支付宝打赏">
+	
+						
+						<img src="http://ojildssc5.bkt.clouddn.com/wechat_commit.jpg" alt="微信打赏">  
+					</div>
+					<script type="text/javascript">
+						document.getElementById('btn_donate').onclick = function(){
+							document.getElementById('donate_board').remove(this);
+							document.getElementById('donate_guide').setAttribute("class","donate_bar center");
+						}
+					</script>
+				</div>
+				
 			</section>
 		</article>
 	</main>

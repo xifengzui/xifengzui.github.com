@@ -13,17 +13,23 @@
     
     
     <item>
-      <title>Hugo博客 优酷视频的改善-修复长宽问题</title>
+      <title>Hugo解决iframe优酷视频美观问题之灵活使用shortcodes</title>
       <link>http://arkis.me/post/0009-hugoyouku/</link>
       <pubDate>Mon, 06 Nov 2017 19:51:52 +0800</pubDate>
       
       <guid>http://arkis.me/post/0009-hugoyouku/</guid>
-      <description>最近开始转用hugo进行个人博客的编写了。由于本人是个视频拍摄爱好者。经常会有一些个人剪辑作品发布。因此就需要在站点上嵌入视频。 问题是国内的这几家视频商，嵌入页面压根就没好好搞。而hugo原生不支持优酷，没办法只有自己想办法来优化。其实说是优化倒不如说是解决iframe的长宽比问题,曾考虑用CSS解决问题，但貌似CSS不支持动态高度。所以解决办法如下。
+      <description>最近开始转用hugo进行个人博客的编写了。由于本人是个视频拍摄爱好者。经常会有一些个人剪辑作品发布。因此就需要在站点上嵌入视频。
+问题是国内的这几家视频商，嵌入页面压根就没好好搞。而hugo原生不支持优酷，没办法只有自己想办法来优化。其实说是优化倒不如说是解决iframe的长宽比问题,曾考虑用CSS解决问题，但貌似CSS不支持动态高度。所以解决办法如下。
 首先我们需要理解 HUGO基于模板的运作方式。
-所有文章内容都依赖于本文所用到的single模板。可以简单理解为，我把所有文章的字全部套上模板进行生成。基于这点我们就可以对统一的优酷外链下手。即一旦检测到优酷外链视频iframe模板。我们就用比较简单粗暴的方式进行参数修改。 举个例子
-&amp;lt;iframe height=498 width=510 src=&#39;http://player.youku.com/embed/XMTI1OTQ0MTIwNA==&#39; frameborder=0 allowfullscreen&amp;gt;&amp;lt;/iframe&amp;gt;  2.在window.onload和onResize的时候对视频的长宽进行修改。
-如上，宽高按照优酷的方式，排版难看。因此我用了比较简单的方式进行内容修改。即探测到iframe标签立即进行宽高修改。
-window.onload = window.onresize = function () { for(var ilength=0;ilength&amp;lt;=document.getElementsByTagName(&amp;quot;iframe&amp;quot;).length;ilength++){ document.getElementsByTagName(&amp;quot;iframe&amp;quot;)[ilength].width = &amp;quot;100%&amp;quot;; document.getElementsByTagName(&amp;quot;iframe&amp;quot;)[ilength].height = document.getElementsByTagName(&amp;quot;iframe&amp;quot;)[ilength].scrollWidth*9/16+&amp;quot;px&amp;quot;;//设定高度 document.getElementsByTagName(&amp;quot;iframe&amp;quot;)[ilength].style=&amp;quot;border-radius: 10px;overflow: hidden;&amp;quot;; } }  这样每次载入页面或者页面发生修改时，优酷播放器的长宽比就会发生变化。相对来说会美观很多。</description>
+所有文章内容都依赖于本文所用到的模板。可以简单理解为，我把所有文章的字全部套上模板进行生成。
+基于这点我们就可以对统一的优酷外链下手。这里我们需要专门为优酷定制一套模板。
+这是优酷传统的外链形式
+&amp;lt;iframe height=498 width=510 src=&#39;http://player.youku.com/embed/XMTI1OTQ0MTIwNA==&#39; frameborder=0 allowfullscreen&amp;gt;&amp;lt;/iframe&amp;gt;  官方文档中写道，模板，即shortcodes有特殊的编写规则
+Shortcode templates have a simple lookup order: /layouts/shortcodes/&amp;lt;SHORTCODE&amp;gt;.html /themes/&amp;lt;THEME&amp;gt;/layouts/shortcodes/&amp;lt;SHORTCODE&amp;gt;.html  说明他们必须存在在 这两个位置。就能被识别了。我建一个youku.html 在里边写道
+&amp;lt;iframe class=&amp;quot;iframe-video&amp;quot; src=&#39;http://player.youku.com/embed/{{ index .Params 0 }}&#39; frameborder=0 allowfullscreen onload=&amp;quot;javascript:this.height = this.scrollWidth*9/16+&#39;px&#39;;&amp;quot;&amp;gt; &amp;lt;/iframe&amp;gt;  建立一个CSS，匹配上面的class要求
+.iframe-video { width:100%; border-radius: 4px; overflow: hidden; }  然后在正文中调用，这就是官方推荐的模板调用形式。注意引号，避免问题。
+ 这样就解决问题了。hugo为我们提供了一套完备的模板方案，我们可以指定一段短代码来代替一整段代码。如上我用shortcode对优酷的代码进行了整合。所有优酷的代码只需要一个视频尾巴信息就够了。这就是模板的强大之处。我只是借助模板之力顺便解决了iframe的问题。
+如果你也想自己编写hugo的模板，请参考hugo的官方文档 http://gohugo.io/templates/shortcode-templates/</description>
     </item>
     
     <item>
@@ -45,7 +51,7 @@ window.onload = window.onresize = function () { for(var ilength=0;ilength&amp;lt
       <guid>http://arkis.me/post/0003-garagecontroler/</guid>
       <description>开源项目地址
 有一次出差，家里没人，被锁在外面了。自己还没钥匙。在大门外晒了半小时太阳。于是想到要是能用手机控制家里的车库进去该多好。有想法就要有行动。网上查一下现有的方案。现有方案基本都是开开关，车库控制器基本没有。鉴于自己使用iphone，肯定是考虑homekit系列产品淘宝了一圈，似乎没有类似产品。那就自己做解决需求。最终实现的效果可以参考我的视频。
- 对了，我这里还有打样多的几块裸板，如果你有需求，可以发我一个地址，到付。
+对了，我这里还有打样多的几块裸板，如果你有需求，可以发我一个地址，到付。
 下面是啰嗦的实现过程，如果你有兴趣也制作一个自己的车库控制器，可以参考下，如果没兴趣就不要看了。
 1.技术难度分析
 我们要实现语音控制，需要苹果官方API支持，而恰好，在gayhub上有一个开源项目名叫homeBridge,是国外黑客们逆向苹果homekit的成果，让大家可以通过苹果控制第三方设备。
@@ -152,7 +158,7 @@ $sudo apt-get install python3-dev python3-pip $pip3 install thefuck  好了装�
 小蚁拍照就是不能仔细看，细看全是马赛克，任你1200W像素，在广角面前完全扛不牢。
 2.拍视频
 其中运动相机的慢动作是我十分喜欢的功能，能够把一些普通的镜头拍出感觉来。
-  先用60帧来拍摄，这样拍出来的视频后期再以30帧速度播放，再加上适当的调整效果刚刚的适合装逼。 但！抖啊~~~~小蚁4K用小屏幕看看还称，4K的录像放到电视机上，抖的都快把自己看吐了，感觉自己得了帕金森。AE后期也救不了。抖是先天缺陷。 所以还是需要防抖支架，不要犹豫了，电子防抖支架肯定是必需品(再让我吐一会)。讲真，这让我损失了太多的素材了。
+先用60帧来拍摄，这样拍出来的视频后期再以30帧速度播放，再加上适当的调整效果刚刚的适合装逼。 但！抖啊~~~~小蚁4K用小屏幕看看还称，4K的录像放到电视机上，抖的都快把自己看吐了，感觉自己得了帕金森。AE后期也救不了。抖是先天缺陷。 所以还是需要防抖支架，不要犹豫了，电子防抖支架肯定是必需品(再让我吐一会)。讲真，这让我损失了太多的素材了。
 3.缺陷
 小蚁在光线明媚的情况下拍摄还是可以的，但是光照度较差的地方，成像简直噩梦，拖影和噪点很糟糕。记得暗处拍摄一定要手动设置。 还有，不要妄想在暗处拍照。血的教训。
 4.总结

@@ -24,6 +24,21 @@
     </item>
     
     <item>
+      <title>About</title>
+      <link>http://arkis.me/about/</link>
+      <pubDate>Sat, 04 Nov 2017 15:21:40 +0800</pubDate>
+      
+      <guid>http://arkis.me/about/</guid>
+      <description>工程师
+曾就职 亚洲光学 参与小米扫地机器人LDS模组开发，负责LDS硬件模组软件代码编写。
+曾就职 浙江大华科技股份有限公司 参与交通相机开发，负责linux系统层级编码模块编写。
+现任职 某医疗企业，参与快销类电子医疗产品开发，负责设备软硬件开发及部门建设。
+联系
+WeChat: jamazui
+Email: xifengzui@yeah.net</description>
+    </item>
+    
+    <item>
       <title>Garage2Arduino-自己搭建的车库语音控制器方案</title>
       <link>http://arkis.me/post/0003-garagecontroler/</link>
       <pubDate>Wed, 31 May 2017 20:46:38 +0000</pubDate>

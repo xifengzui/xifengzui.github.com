@@ -38,8 +38,8 @@
   </url>
   
   <url>
-    <loc>http://arkis.me/post/0001-blogtransfer/</loc>
-    <lastmod>2017-01-08T21:42:46+00:00</lastmod>
+    <loc>http://arkis.me/post/0002-yi4k/</loc>
+    <lastmod>2017-01-10T20:05:32+00:00</lastmod>
   </url>
   
   <url>
@@ -104,6 +104,12 @@
   <url>
     <loc>http://arkis.me/</loc>
     <lastmod>2017-11-04T16:38:19+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://arkis.me/tags/%E6%91%84%E5%83%8F/</loc>
+    <lastmod>2017-01-10T20:05:32+00:00</lastmod>
     <priority>0</priority>
   </url>
   

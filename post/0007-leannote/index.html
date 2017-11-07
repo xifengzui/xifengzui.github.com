@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,height=device-height, user-scalable=no,initial-scale=1, minimum-scale=1, maximum-scale=1,target-densitydpi=device-dpi ">
+<meta name="generator" content="Hugo 0.30.2" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="fonts.lug.ustc.edu.cn/css?family=Roboto:400,700" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/github.min.css">
+<link rel="stylesheet" href="/css/normalize.css">
+<link rel="stylesheet" href="/css/skeleton.css">
+<link rel="stylesheet" href="/css/custom.css">
+<link rel="alternate" href="/index.xml" type="application/rss+xml" title="惜枫醉">
+<title>leanote-私人的云笔记 - 惜枫醉</title>
+</head>
+<body>
+
+<div class="container">
+
+	<header role="banner">
+		<div class="header-logo">
+			<a href="/"><img src="https://s.gravatar.com/avatar/45de30c48912968eb292222014b646e8?s=200" width="60" height="60" alt="惜枫醉"></a>
+		</div>
+		
+	</header>
+
+
+	<main role="main">
+		<article itemscope itemtype="http://arkis.me/about">
+			<h1 class="entry-title" itemprop="headline">leanote-私人的云笔记</h1>
+			<span class="entry-meta"><time itemprop="datePublished" datetime="2017-02-12">2017年02月12日</time></span>
+			<section itemprop="entry-text">
+				<p>最近思考资料多的情况下如何做到多电脑同步，考虑使用一款云笔记app。奈何网络上各种云笔记基本不是收费就是速度慢，要么功能限制，不能够多app同步。个人希望能够有一款云笔记，能够做到云笔记的一切，而且也有各个平台的app，能实时同步我的笔记。趁放假，今天花了一些时间在Github及其他平台上搜索了下，发现了蚂蚁笔记-leanote，它是一款<strong>开源</strong>云笔记，而且能够支持私有云搭建，同时也是国人开发的一款云笔记。大家可以浏览其官网
+<em>www.leanote.com</em>
+得到更多信息
+这个笔记软件提供了包括windows ios linux mac全平台的应用。并且提供了linux端的服务端程序，如果有一定的linux基础，可以尝试使用服务端程序用在你自己的生产环境种。笔记服务端可以部署在公司局域网，或自己的nas上，奕可以开放到公共的网络上，提供大家注册使用。或者直接下载人家提供的windows版本服务程序安装。如果懒得弄也没关系，可以尝试试用下人家提供的服务，还是相当不错的，可以支持下。</p>
+
+<p>个人搭载在自己的NAS linux服务器上，并且开发了公网访问，让我随时随地可以在各个地方使用服务，主要是免费可以获得所有功能，并且资料在自己这里，不说稳定，至少安全。</p>
+
+<hr />
+
+<p><strong>服务端安装</strong>
+你可以访问<a href="https://github.com/leanote">leanote Github(EN)</a> 直接获得操作说明</p>
+
+<p>我的安装方式是直接获取x86bin安装，省略编译过程，如果您是其他处理器平台，请直接获取源代码安装。可以参考
+[源代码安装说明(EN)](<a href="https://github.com/leanote/leanote/wiki/Leanote-source-installation-on-Mac-and-Linux-(En">https://github.com/leanote/leanote/wiki/Leanote-source-installation-on-Mac-and-Linux-(En</a>)
+从此页面获得安装包
+<a href="http://leanote.org/#download">http://leanote.org/#download</a></p>
+
+<p><strong>下面是从bin安装的过程</strong></p>
+
+<p>我们暂定把/home/user 目录作为安装目录</p>
+
+<pre><code class="language-shell">$ cd /home/user
+$ wget https://jaist.dl.sourceforge.net/project/leanote-bin/2.3/leanote-linux-amd64-v2.3.bin.tar.gz
+$ tar -zxvf leanote-linux-amd64-v2.3.bin.tar.gz
+</code></pre>
+
+<p>binary解压完毕，准备下数据库 mongodb,我们假定安装在/opt/mongodb目录</p>
+
+<pre><code class="language-shell">$ wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-3.0.1.tgz
+$ tar-zxvf mongodb-linux-x86_64-3.0.1.tgz
+$ mv mongodb-linux-x86_64-3.0.1 /opt/mongodb
+</code></pre>
+
+<p>记得讲解压的东西全部拷贝到
+现在我们把mongodb放到环境变量</p>
+
+<pre><code class="language-shell">$vim /etc/profile
+
+export PATH=$PATH:/home/user1/mongodb/bin
+</code></pre>
+
+<p>让变量生效</p>
+
+<pre><code class="language-shell">$ source /etc/profile
+</code></pre>
+
+<p>测试下安装情况，在你的数据存储目录下，先建立一个存数据的文件夹，再在里边敲入测试命令</p>
+
+<pre><code class="language-shell">$ mkdir /home/user/data
+$ mongod --dbpath /home/user/data &amp;
+</code></pre>
+
+<p>现在可以测试mongod的情况了</p>
+
+<pre><code class="language-shell">$mongo
+&gt;show dbs
+</code></pre>
+
+<p>如果打印正常，那么就走到下一步，把leanote链到你的数据库</p>
+
+<pre><code class="language-shell">$ mongorestore -h localhost -d leanote --dir /home/user/leanote/mongodb_backup/leanote_install_data/
+</code></pre>
+
+<p>然后 show dbs应该就能看到了</p>
+
+<pre><code class="language-shell">$ mongo
+&gt;show dbs
+
+leanote 0.203125GB
+local   0.078125GB
+</code></pre>
+
+<p>2.设置
+leanote的设置选项全部在安装目录种的app.conf。你可以仔细研究下，一些参数还是要改动的，比如链接名称，还有demo的开关。demo页面目前开关不了，你可以先改掉demo的密码，让demo用户无法登陆就好了。还有，如果希望打开不跳到初始页面可以修改conf目录下的router文件。</p>
+
+<p>3.运行
+运行很简单，到leanote目录下直接bash run.sh即刻</p>
+
+<pre><code class="language-shell">$ cd /home/user/leanote
+$ bash run.sh
+</code></pre>
+
+<p>登陆就可以看到您的运行效果了，默认端口9000,可在conf中进行修改。</p>
+
+<p>4.官方提示
+官方提示mongodb是没加密码的，如果你要加密码，可以参考<a href="https://github.com/leanote/leanote/wiki/Leanote-QA-English#6-how-to-add-new-users-to-mongodb-database">how to add new user to mongodb database</a></p>
+
+<p>以上大致是对官方文档的中文化，按照我安装时理解步骤写下来，我也在这篇文章中写到了一些我遇到的问题，不排除以后leanote版本更新导致本文章操作不可用。所以看这篇文章，如果您操作的话，请注意书写时间。
+如果您遇到了问题，可以直接参考英文文档</p>
+
+<p>相关链接
+[官方安装说明(EN)](<a href="https://github.com/leanote/leanote/wiki/leanote-binary-installation-on-Mac-and-Linux-(En">https://github.com/leanote/leanote/wiki/leanote-binary-installation-on-Mac-and-Linux-(En</a>)</p>
+
+
+				<span class="ref-txt">原创文章，如需转载引用请注明 "本文章首发于惜枫醉的个人博客: http://arkis.me"</span>
+				
+				
+				<div class ="post-donate">
+					<div id="donate_board" class="donate_bar center">
+						<a id="btn_donate" class="btn_donate" href="javascript:;" title="打赏"></a>
+						<span class="donate_txt">
+						   觉得文章有用的话，请随意打赏。您的支持将鼓励我继续创作！
+						</span>
+						<br>
+					</div>
+
+					<div id="donate_guide" class="donate_bar center hidden" >
+						<form action="https://shenghuo.alipay.com/send/payment/fill.htm"
+							method="POST" target="_blank" accept-charset="GBK">
+							<input name="optEmail" type="hidden" value="359939992@qq.com" />
+							<input name="payAmount" type="hidden" value="1" />
+							<input id="title" name="title" type="hidden" value="打赏惜枫醉的文章" />
+							<input name="memo" type="hidden" value="留下您的大名及联系方式(email,wechat,weibo)，多交流共勉共进。" />
+							<input name="pay" type="image" value="转账"
+								src="https://img.alipay.com/sys/personalprod/style/mc/btn-index.png" />
+						</form>
+
+						
+						<img src="http://ojildssc5.bkt.clouddn.com/alipay_scan_code.jpg" alt="支付宝打赏">
+						
+						<img src="http://ojildssc5.bkt.clouddn.com/wechat_scan_code.jpg" alt="微信打赏">
+						<span class="donate_txt">
+								请简单粗暴地爱我
+						</span>
+					</div>
+					<script type="text/javascript">
+						document.getElementById('btn_donate').onclick = function(){
+							document.getElementById('donate_board').remove(this);
+							document.getElementById('donate_guide').setAttribute("class","donate_bar center");
+						}
+					</script>
+				</div>
+
+				
+				<div id="lv-container" data-id="city" data-uid="MTAyMC8zMTcxMC84Mjc0">
+						<script type="text/javascript">
+					(function(d, s) {
+						var j, e = d.getElementsByTagName(s)[0];
+					
+						if (typeof LivereTower === 'function') { return; }
+					
+						j = d.createElement(s);
+						j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+						j.async = true;
+					
+						e.parentNode.insertBefore(j, e);
+					})(document, 'script');
+						</script>
+					<noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
+				</div>
+				
+				
+				
+			</section>
+		</article>
+	</main>
+
+
+	<footer role="contentinfo">
+		<div class="hr"></div>
+		<div class="footer-link">
+			<a href="mailto:xifengzui@yeah.net" target="_blank">Email</a>
+			
+			
+			<a href="https://github.com/xifengzui" target="_blank">GitHub</a>
+			<a href="https://www.weibo.com/malermad" target="_blank">微博</a>
+			
+			<a href="/about" target="_blank">关于</a>
+		</div>
+		<div class="copyright">Copyright &copy; 惜枫醉 All rights reserved.</div>
+	</footer>
+
+</div>
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+</body>
+</html>

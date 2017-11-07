@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,height=device-height, user-scalable=no,initial-scale=1, minimum-scale=1, maximum-scale=1,target-densitydpi=device-dpi ">
+<meta name="generator" content="Hugo 0.30.2" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="fonts.lug.ustc.edu.cn/css?family=Roboto:400,700" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/github.min.css">
+<link rel="stylesheet" href="/css/normalize.css">
+<link rel="stylesheet" href="/css/skeleton.css">
+<link rel="stylesheet" href="/css/custom.css">
+<link rel="alternate" href="/index.xml" type="application/rss+xml" title="惜枫醉">
+<title>Garage2Arduino-自己搭建的车库语音控制器方案 - 惜枫醉</title>
+</head>
+<body>
+
+<div class="container">
+
+	<header role="banner">
+		<div class="header-logo">
+			<a href="/"><img src="https://s.gravatar.com/avatar/45de30c48912968eb292222014b646e8?s=200" width="60" height="60" alt="惜枫醉"></a>
+		</div>
+		
+	</header>
+
+
+	<main role="main">
+		<article itemscope itemtype="http://arkis.me/about">
+			<h1 class="entry-title" itemprop="headline">Garage2Arduino-自己搭建的车库语音控制器方案</h1>
+			<span class="entry-meta"><time itemprop="datePublished" datetime="2017-05-31">2017年05月31日</time></span>
+			<section itemprop="entry-text">
+				<p><a href="https://github.com/xifengzui/homebridge-garage2Arduino/tree/master">开源项目地址</a></p>
+
+<p>有一次出差，家里没人，被锁在外面了。自己还没钥匙。在大门外晒了半小时太阳。于是想到要是能用手机控制家里的车库进去该多好。有想法就要有行动。网上查一下现有的方案。现有方案基本都是开开关，车库控制器基本没有。鉴于自己使用iphone，肯定是考虑homekit系列产品淘宝了一圈，似乎没有类似产品。那就自己做解决需求。最终实现的效果可以参考我的视频。</p>
+
+<div style="overflow:auto;-webkit-overflow-scrolling:touch;">
+    <iframe id="XMjc5NjU5NDMwOA=="  class="iframe-video" src='http://player.youku.com/embed/XMjc5NjU5NDMwOA==' frameborder=0 allowfullscreen>
+    </iframe>
+</div>
+<script type="text/javascript">
+    if(screen.width<620)
+    {
+        document.getElementById("XMjc5NjU5NDMwOA==").width = width;
+        document.getElementById("XMjc5NjU5NDMwOA==").height = document.getElementById("XMjc5NjU5NDMwOA==").scrollWidth*9/16+'px';
+    }
+    else
+    {
+        document.getElementById("XMjc5NjU5NDMwOA==").height = document.getElementById("XMjc5NjU5NDMwOA==").scrollWidth*9/16+'px';
+    }
+    
+</script>
+
+
+<p><strong>对了，我这里还有打样多的几块裸板，如果你有需求，可以发我一个地址，到付。</strong></p>
+
+<p>下面是啰嗦的实现过程，如果你有兴趣也制作一个自己的车库控制器，可以参考下，如果没兴趣就不要看了。</p>
+
+<p><strong>1.技术难度分析</strong></p>
+
+<p>我们要实现语音控制，需要苹果官方API支持，而恰好，在gayhub上有一个开源项目名叫homeBridge,是国外黑客们逆向苹果homekit的成果，让大家可以通过苹果控制第三方设备。</p>
+
+<p>不得不说开源大法好。首先我们需要了解这个开源项目的可用性。</p>
+
+<p>这是官方简介：</p>
+
+<p>Homebridge is a lightweight NodeJS server you can run on your home network that emulates the iOS HomeKit API. It supports Plugins, which are community-contributed modules that provide a basic bridge from HomeKit to various 3rd-party APIs provided by manufacturers of &ldquo;smart home&rdquo; devices.</p>
+
+<p>Since Siri supports devices added through HomeKit, this means that with Homebridge you can ask Siri to control devices that don&rsquo;t have any support for HomeKit at all. For instance, using just some of the available plugins, you can say:</p>
+
+<pre><code class="language-shell">Siri, unlock the back door. [pictured above]
+Siri, open the garage door.
+Siri, turn on the coffee maker.
+Siri, turn on the living room lights.
+Siri, good morning!
+</code></pre>
+
+<p>You can explore all available plugins at the NPM website by searching for the keyword homebridge-plugin.</p>
+
+<p>大意就是，homebridge是一个轻量化的Nodejs服务器，它能模拟IOS Homekit API，他通过插件来支持第三方设备。</p>
+
+<p>先把它用起来，作为里程碑的第一步。</p>
+
+<p><strong>1.1   了解homebridge</strong></p>
+
+<p><a href="https://github.com/nfarina/homebridge">homebridge</a></p>
+
+<p>尝试在虚拟机安装homeBridge</p>
+
+<p>安装nodejs</p>
+
+<pre><code class="language-shell">zx -d node-v6.10.0-linux-x64.tar.zx
+tar -xvf node-v6.10.0-linux-x64.tar
+su root
+mkdir /opt/nodejs
+mv node-v6.10.0-linux-x64 /opt/nodejs/
+</code></pre>
+
+<p>输出nodeJs到全局变量</p>
+
+<pre><code class="language-shell">vim /etc/profile
+export PATH=&quot;/opt/nodejs/node-v6.10.0-linux-x64/bin:$PATH&quot;
+</code></pre>
+
+<p>鉴于众所周知的原因，官方网站访问速度慢 使用淘宝源，淘宝源是对官方源全拷贝</p>
+
+<p>参考站点: npm.taobao.org</p>
+
+<pre><code class="language-shell">npm install -g cnpm --registry=https://registry.npm.taobao.org
+</code></pre>
+
+<p>安装avahi及相关依赖包</p>
+
+<p>avahi-daemon是一种Linux操作系统上运行在客户机上实施查找基于网络的Zeroconf service的服务守护进程。 该服务可以为Zeroconf网络实现DNS服务发现及DNS组播规范。 用户程序通过Linux D-Bus信息传递接收发现到网络服务和资源的通知。 该守护进程配合缓存用户程序的答复，以帮助减少因答复而产生的网络流量。</p>
+
+<pre><code class="language-shell">sudo apt-get install libavahi-compat-libdnssd-dev
+</code></pre>
+
+<p>安装homeBridge依赖包</p>
+
+<pre><code class="language-shell">sudo cnpm install -g --unsafe-perm homebridge
+sudo cnpm install -g --unsafe-perm hap-nodejs
+sudo cnpm install -g --unsafe-perm node-gyp
+</code></pre>
+
+<p>如果淘宝源无法使用则通过</p>
+
+<pre><code class="language-shell">sudo npm install -g --unsafe-perm homebridge hap-nodejs node-gyp
+</code></pre>
+
+<p>接下来安装支持组件</p>
+
+<pre><code class="language-shell">cd /usr/local/lib/node_modules/homebridge/
+sudo cnpm install --unsafe-perm bignum
+cd /usr/local/lib/node_modules/hap-nodejs/node_modules/mdns
+sudo node-gyp BUILDTYPE=Release rebuild
+</code></pre>
+
+<p>现在应该算安装完毕了</p>
+
+<p>先跑一下看看，是个什么东西</p>
+
+<pre><code class="language-shell">homeBridge
+</code></pre>
+
+<p><img src="http://ojildssc5.bkt.clouddn.com/homebridge_run.png" alt="homebridge running" /></p>
+
+<p>工作状态不错，一些警告查阅了一下资料确定没有问题，下一步就是编写与节点的通讯了，得先写插件再写节点通讯。</p>
+
+<p><strong>Writing Plugins</strong></p>
+
+<p>We don&rsquo;t have a lot of documentation right now for creating plugins, but there are many existing plugins you can study.</p>
+
+<p>The best place to start is the included Example Plugins. Right now this contains a single plugin that registers a platform that offers fake light accessories. This will show you how to use the Homebridge Plugin API.</p>
+
+<p>For more example on how to construct HomeKit Services and Characteristics, see the many Accessories in the Legacy Plugins repository.</p>
+
+<p>You can also view the full list of supported HomeKit Services and Characteristics in the HAP-NodeJS protocol repository.</p>
+
+<p>And you can find an example plugin that publishes an individual accessory at here.</p>
+
+<p>See more examples on how to create Platform classes in the Legacy Plugins repository.</p>
+
+<p>这就尴尬了，没文档啊，没办法，硬上啊</p>
+
+<p>首先得理解下工作过程，软件全程使用js编写，得先过一遍Nodejs，先去看一遍教程吧。</p>
+
+<p>&hellip;..几天后&hellip;..</p>
+
+<p>花了一些时间大概估摸了一下JS的基本语法，接下来就是过一遍Nodejs的基本框架结构。然后进行一个总结是非常有必要的。</p>
+
+<p>大致了解NodeJs的基本语法后再回过头来了解了一下整个HomeBridge的基础结构，HomeBridge 是基于GIthub上一个叫做Hap的项目开发的。hap项目是黑客们逆向apple的HomeKit做的。现在因为法务的关系，相关说明已经关闭。啃了一会代码后，发现整个Homebridge是一种插件+框架的结构完成的方式实现的。如果多了一个设备，可以通过编写对应的插件，丰富到npm库中，可以看到各式各样的插件，包括开关空调车库等。了解了这些后就开始对症下药。我们的目标是增加车库的控制器，当然需要仔细啃一下这部分代码，我们下载了几份garage的人家已经完成的样例，及官方的hap代码，发现整个车库的开关都是由一个叫GarageDoorOpener实现的，这个类是在HAP中实现，提供给各个插件相关接口。需要啃一会。相关插件内容也不少。这里可看到各种相关的传感器都实现了一个nodejs的插件类。如果有想实现的，可以参考该部分代码。当然也需要参考别人家的例子，毕竟人家都没有提供文档，只能通过自己阅读实现。</p>
+
+<p>经过一段时间的软件研读后，基本了解了它软件实现方式。现在可以写插件了。参考了部分npm上的代码，结合npm的入门知识。写了第一个自己的homebridge插件</p>
+
+<pre><code class="language-javascript">var Service, Characteristic, DoorState;;
+
+module.exports = (homebridge) =&gt; {
+  Service = homebridge.hap.Service;
+  Characteristic = homebridge.hap.Characteristic;
+  DoorState = homebridge.hap.Characteristic.CurrentDoorState
+  homebridge.registerAccessory('homebridge-garage2arduino', 'Garage2Ardiuno', Garage2Ardiuno);
+};
+
+//constructor function
+function Garage2Ardiuno(log, config){
+
+    //get config values for gobal config value;
+    this.name = config['name'];
+    this.serverPort = config['serverPort'] || 10400;
+    this.simulateTimeOpening = config['simulateTimeOpening'] || 15;
+    this.simulateTimeClosing = config['simulateTimeClosing'] || 15;
+    this.accessSecret = config['accessSecret'];
+
+    //initial setup
+    this.log = log;
+    this.service = new Service.GarageDoorOpener(this.name, this.name);
+    this.garage2ArdiunoWorkOnInit(this.service);
+
+    this.informationService = new Service.AccessoryInformation();
+    this.informationService
+      .setCharacteristic(Characteristic.Manufacturer, 'Garage 2 Ardiuno')
+      .setCharacteristic(Characteristic.Model, 'a garage door controler')
+      .setCharacteristic(Characteristic.SerialNumber, 'version 1.00');
+}
+
+//prototype definetion
+Garage2Ardiuno.prototype = {
+
+
+  //function get service API 
+  getServices: function (){
+    return [this.informationService, this.service];
+  },
+
+  //function workonInit
+  garage2ArdiunoWorkOnInit: function (service) {
+    this.service.setCharacteristic(Characteristic.TargetDoorState, Characteristic.TargetDoorState.CLOSED);
+    this.service.setCharacteristic(Characteristic.CurrentDoorState, Characteristic.CurrentDoorState.CLOSED);
+    service.getCharacteristic(Characteristic.TargetDoorState).on('get', this.G2AGet.bind(this));
+    service.getCharacteristic(Characteristic.TargetDoorState).on('set', this.G2ASet.bind(this));
+  },
+
+  //function get
+  G2AGet: function(callback){
+    console.log(&quot;call get&quot;);
+    var curTimePoint = new Date().getTime()/1000;
+    var curDoorStat = this.service.getCharacteristic(Characteristic.CurrentDoorState).value;
+
+    if(curDoorStat === DoorState.OPENING)
+    {
+
+      var openTimeGap = curTimePoint-this.openTimePoint;
+
+      if(openTimeGap &gt; this.simulateTimeOpening)
+      {
+        this.service.setCharacteristic(Characteristic.CurrentDoorState,Characteristic.CurrentDoorState.OPEN);
+        //console.log(&quot;++open &quot;);
+        callback(null,DoorState.OPEN);
+      }
+      else
+      {
+        this.service.setCharacteristic(Characteristic.CurrentDoorState,Characteristic.CurrentDoorState.OPENING);
+        //console.log(&quot;++opeing &quot;);
+        callback(null,DoorState.OPEN);
+      }
+
+    }
+    else if(curDoorStat === DoorState.CLOSING)
+    {
+      var closeTimeGap = curTimePoint-this.closeTimePoint;
+      if(closeTimeGap &gt; this.simulateTimeClosing)
+      {
+        this.service.setCharacteristic(Characteristic.CurrentDoorState,Characteristic.CurrentDoorState.CLOSED);
+        //console.log(&quot;++closed &quot;);
+        callback(null,DoorState.CLOSED);
+      }
+      else
+      {
+        this.service.setCharacteristic(Characteristic.CurrentDoorState, Characteristic.CurrentDoorState.CLOSING);
+        //console.log(&quot;++closing &quot;);
+        callback(null,DoorState.CLOSED);
+      }
+
+    }
+    else
+    {
+      //console.log(&quot;++notchange &quot;,curDoorStat,DoorState.OPEN,DoorState.CLOSED,DoorState.OPENING,DoorState.CLOSING);
+      callback(null,curDoorStat);
+    }
+
+  },
+
+
+  //function set
+  G2ASet: function(value,callback)
+  {
+
+    console.log(&quot;call set value&quot;,value,Characteristic.TargetDoorState.OPEN,Characteristic.TargetDoorState.CLOSED);
+    if (value === Characteristic.TargetDoorState.OPEN)
+    {
+      console.log(&quot;GarageDoor Open&quot;);
+      this.openTimePoint = new Date().getTime()/1000;
+      callback();
+      this.service.setCharacteristic(Characteristic.CurrentDoorState,Characteristic.CurrentDoorState.OPENING);
+    }
+
+    else if(value === Characteristic.TargetDoorState.CLOSED)
+    {
+      console.log(&quot;GarageDoor Close&quot;);
+      this.closeTimePoint = new Date().getTime()/1000;
+      callback();
+      this.service.setCharacteristic(Characteristic.CurrentDoorState, Characteristic.CurrentDoorState.CLOSING);
+    }
+
+  }
+
+}
+</code></pre>
+
+<p> 以上代码段能够实现一个假冒的车库控制器不需要任何硬件。由了解到的信息可以知道homebridge的工作如下图我总结的这样</p>
+
+<p><img src="http://ojildssc5.bkt.clouddn.com/homebridge_flow.png" alt="homebridge flow" /></p>
+
+<p><strong>1.2   硬件</strong></p>
+
+<p>我们对整个执行流程已经有了大概理解，因此在这里考虑怎么设计硬件了。</p>
+
+<p>我开始有几个想法</p>
+
+<p><em>1.普通的315\433模块+单片机实现操控</em></p>
+
+<p><em>2.wifi模块+单片机实现操控</em></p>
+
+<p><em>3.网线直接肛+uIP</em></p>
+
+<p><em>4.上RaspberryPi实现功能</em></p>
+
+<p>很快排出了1、3、4 。</p>
+
+<p>1的通用性太差了，3网线布线麻烦，而且协议栈没用过，不知道会花多久，要这个导致整个项目黄了就不好了。4  RPI太贵了，而且有点大财小用，家里有linuxNAS完全可以代替掉功能。</p>
+
+<p>考虑后基本定下方案，如下图所示</p>
+
+<p><img src="http://ojildssc5.bkt.clouddn.com/homebridge_tree.png" alt="flow" /></p>
+
+<p><strong>1.3 总结</strong></p>
+
+<p>整个方案技术难度低，整个项目<del>因为自己偷懒而导致黄掉</del>的风险可控。</p>
+
+<p><strong>2.执行</strong></p>
+
+<p><strong>2.1 硬件平台方案</strong></p>
+
+<p><strong>服务器端</strong></p>
+
+<p>家里有NAS，你也可以使用树莓派，老旧笔记本等，反正只要能跑nodejs的设备即可。</p>
+
+<p><strong>车库端:</strong></p>
+
+<p>模块那么多，不量产就不做集成了，直接搭积木块。</p>
+
+<p>选型过程省略N字基本就是淘宝</p>
+
+<p>以下是BOM</p>
+
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>价格</th>
+<th>数量</th>
+<th>用途</th>
+<th>TB</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>ESP8266串口WIFI无线模块WIF收发无线模块</td>
+<td>9.4</td>
+<td>1</td>
+<td>数据收发</td>
+<td><a href="https://detail.tmall.com/item.htm?id=540067174120&amp;spm=a1z09.2.0.0.xazHRp&amp;_u=v96l7ape468">https://detail.tmall.com/item.htm?id=540067174120&amp;spm=a1z09.2.0.0.xazHRp&amp;_u=v96l7ape468</a></td>
+</tr>
+
+<tr>
+<td>Arduino Nano V3 ATMega328P</td>
+<td>9.2</td>
+<td>1</td>
+<td>主控</td>
+<td><a href="https://item.taobao.com/item.htm?spm=a1z09.2.0.0.xazHRp&amp;id=531487412230&amp;_u=v96l7apf7c1">https://item.taobao.com/item.htm?spm=a1z09.2.0.0.xazHRp&amp;id=531487412230&amp;_u=v96l7apf7c1</a></td>
+</tr>
+
+<tr>
+<td>4路带继电器光耦模块</td>
+<td>6.59</td>
+<td>1</td>
+<td>电机控制</td>
+<td><a href="https://item.taobao.com/item.htm?spm=a1z09.2.0.0.xazHRp&amp;id=6731653313&amp;_u=v96l7ap744f">https://item.taobao.com/item.htm?spm=a1z09.2.0.0.xazHRp&amp;id=6731653313&amp;_u=v96l7ap744f</a></td>
+</tr>
+
+<tr>
+<td>220V转5V电源模块</td>
+<td>10.5</td>
+<td>1</td>
+<td>总电源</td>
+<td><a href="https://buyertrade.taobao.com/trade/itemlist/list_bought_items.htm?spm=a21bo.50862.1997525045.2.RBEhap">https://buyertrade.taobao.com/trade/itemlist/list_bought_items.htm?spm=a21bo.50862.1997525045.2.RBEhap</a></td>
+</tr>
+
+<tr>
+<td>电源3脚插座</td>
+<td>5</td>
+<td>1</td>
+<td>电源头</td>
+<td><a href="https://item.taobao.com/item.htm?spm=a1z09.2.0.0.xazHRp&amp;id=520812099558&amp;_u=v96l7apd51a">https://item.taobao.com/item.htm?spm=a1z09.2.0.0.xazHRp&amp;id=520812099558&amp;_u=v96l7apd51a</a></td>
+</tr>
+
+<tr>
+<td>电源3脚插母</td>
+<td>4.5</td>
+<td>1</td>
+<td>电源母头</td>
+<td><a href="https://item.taobao.com/item.htm?spm=a1z09.2.0.0.xazHRp&amp;id=523912847491&amp;_u=v96l7ap084a">https://item.taobao.com/item.htm?spm=a1z09.2.0.0.xazHRp&amp;id=523912847491&amp;_u=v96l7ap084a</a></td>
+</tr>
+
+<tr>
+<td>触摸按钮</td>
+<td>2.6</td>
+<td>3</td>
+<td>按钮</td>
+<td><a href="https://detail.tmall.com/item.htm?id=524832982387&amp;spm=a1z09.2.0.0.xazHRp&amp;_u=v96l7ap4716">https://detail.tmall.com/item.htm?id=524832982387&amp;spm=a1z09.2.0.0.xazHRp&amp;_u=v96l7ap4716</a></td>
+</tr>
+
+<tr>
+<td>旋转编码器</td>
+<td>5</td>
+<td>1</td>
+<td>旋钮</td>
+<td><a href="https://buyertrade.taobao.com/trade/itemlist/list_bought_items.htm?spm=a21bo.50862.1997525045.2.RBEhap">https://buyertrade.taobao.com/trade/itemlist/list_bought_items.htm?spm=a21bo.50862.1997525045.2.RBEhap</a></td>
+</tr>
+
+<tr>
+<td>5V转3.3V DCDC电源模块</td>
+<td>4</td>
+<td>1</td>
+<td>3v3电源</td>
+<td><a href="https://item.taobao.com/item.htm?spm=a1z09.2.0.0.xazHRp&amp;id=534263863865&amp;_u=v96l7ap15f1">https://item.taobao.com/item.htm?spm=a1z09.2.0.0.xazHRp&amp;id=534263863865&amp;_u=v96l7ap15f1</a></td>
+</tr>
+
+<tr>
+<td>6pin排线</td>
+<td>0.6</td>
+<td>排线</td>
+<td></td>
+<td><a href="https://item.taobao.com/item.htm?spm=a1z09.2.0.0.xazHRp&amp;id=542126237591&amp;_u=v96l7ap46ef">https://item.taobao.com/item.htm?spm=a1z09.2.0.0.xazHRp&amp;id=542126237591&amp;_u=v96l7ap46ef</a></td>
+</tr>
+
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+
+<tr>
+<td>总价</td>
+<td>57.3</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+<p>为以上所有的材料画一块简单的主板 ，打样花费50块钱。</p>
+
+<p>相关电路原理和制版请参考</p>
+
+<p><a href="https://github.com/xifengzui/homebridge-garage2Arduino/tree/master/PCB%20Layout">PCB板</a></p>
+
+<p><img src="http://ojildssc5.bkt.clouddn.com/homebridge_sch.png" alt="sch" /></p>
+
+<p>当时我做的时候没有外壳，后来我买了个3D打印机。</p>
+
+<p>组装3D打印机花了我1周多时间。</p>
+
+<p><img src="http://ojildssc5.bkt.clouddn.com/homebridge_3dprint.png" alt="3d print" /></p>
+
+<p><img src="http://ojildssc5.bkt.clouddn.com/homebridge_printFinish.png" alt="print finished" /></p>
+
+<p><img src="http://ojildssc5.bkt.clouddn.com/homebridge_finishedpng.png" alt="成品" /></p>
+
+<p>所有物料安装完毕。</p>
+
+<p>3D模型请参考，我使用skecthup编辑制作。</p>
+
+<p><a href="https://github.com/xifengzui/homebridge-garage2Arduino/tree/master/3D%20Model">3d模型</a></p>
+
+<p>整个硬件做完后，因为工作太忙，中间隔了一两个月才继续进行下面的软件编程。</p>
+
+<p>中间还因为对AVR单片机不了解，导致RAM爆表的情况出现，毕竟Arduino Nano V3只有2K RAM&hellip;..</p>
+
+<p>对于液晶显示，我设计了一套自己的条目菜单UI，可以通过旋钮设置IP</p>
+
+<p>这套代码比较简单，可以跑一个比较完整条目菜单，只要进行简单生成就可以了</p>
+
+<pre><code class="language-c">/*****************************************************************************
+* Author  : 惜枫醉
+* Date    : 2017/04/09
+* Brief   : 构造一个初始菜单,整个界面的核心逻辑在这里生成。
+* Return  : 
+* Remarks : 
+******************************************************************************/
+Int8 APP_menuGen(void)
+{
+    MENU_init();
+    Int8 ret = 0;
+	TIMER_register(4000, APP_timerDaemon);
+	TIMER_register(1000,APP_clockService);
+    APP_dumpPrms();
+    //申请主页
+    ret |= MENU_requestPage(&amp;gMainMenu);
+    ret |= MENU_setPageTitle(gMainMenu,PSTR(&quot;GARAGE CONTROLER&quot;), TEXT_FLASH);
+
+    if(ret)
+    {
+        dbgMsg(&quot;mainPage fail&quot;);
+        goto ERR_OUT;
+    }
+    
+    //申请车库页
+    ret |= MENU_requestItemFromPage(gMainMenu, &amp;gMainMenu_garage);
+    ret |= MENU_setItemText(gMainMenu_garage, PSTR(&quot;GARAGE SETTING&quot;), TEXT_FLASH);
+    //申请车库子菜单
+    ret |= MENU_requestPage(&amp;gGarageMenu);
+    ret |= MENU_setPageTitle(gGarageMenu,PSTR(&quot;GARAGE SETTING&quot;), TEXT_FLASH);
+    //为车库添加返回到主菜单条目
+    ret |= MENU_requestItemFromPage(gGarageMenu, &amp;gGarageMenu_goBack);
+    ret |= MENU_setItemText(gGarageMenu_goBack, PSTR(&quot;GO BACK&quot;), TEXT_FLASH);
+    //将主菜单注册为返回条目的子菜单
+    ret |= MENU_setItemSubPage(gGarageMenu_goBack, gMainMenu);
+    
+    //为车库添加上和下两个可变的内存
+    ret |= MENU_requestItemFromPage(gGarageMenu, &amp;gGarageMenu_upTimeMenu);
+    sprintf(gAPP_garagePrms.upTimeStr,&quot;UP TIME:%02u&quot;,gAPP_garagePrms.upTime);
+    ret |= MENU_setItemText(gGarageMenu_upTimeMenu, gAPP_garagePrms.upTimeStr, TEXT_RAM);
+    ret |= MENU_setItemEvent(gGarageMenu_upTimeMenu, APP_garageSetWorkingUpTime, NULL);
+    ret |= MENU_requestItemFromPage(gGarageMenu, &amp;gGarageMenu_downTimeMenu);
+    sprintf(gAPP_garagePrms.downTimeStr,&quot;DOWN TIME:%02u&quot;,gAPP_garagePrms.downTime);
+    ret |= MENU_setItemText(gGarageMenu_downTimeMenu, gAPP_garagePrms.downTimeStr, TEXT_RAM);
+    ret |= MENU_setItemEvent(gGarageMenu_downTimeMenu, APP_garageSetWorkingDownTime, NULL);
+
+	ret |= MENU_requestItemFromPage(gGarageMenu, &amp;gGarageMenu_enableHomekit);
+	ret |= MENU_setItemText(gGarageMenu_enableHomekit, &quot;ENABLE HOMTKIT&quot;, TEXT_RAM);
+	ret |= MENU_setItemEvent(gGarageMenu_enableHomekit, APP_garageEnableHomekit, NULL);
+	ret |= MENU_requestItemFromPage(gGarageMenu, &amp;gGarageMenu_disableHomekit);
+	ret |= MENU_setItemText(gGarageMenu_disableHomekit, &quot;DISABLE HOMTKIT&quot;, TEXT_RAM);
+	ret |= MENU_setItemEvent(gGarageMenu_disableHomekit, APP_garageDisalbeHomekit, NULL);
+    
+    //将车库申请的子菜单注册到主菜单的车库项中去
+    ret |= MENU_setItemSubPage(gMainMenu_garage, gGarageMenu);
+    
+    if(ret)
+    {
+        dbgMsg(&quot;garage fail&quot;);
+        goto ERR_OUT;
+    }
+    
+    //申请wifi页
+    ret |= MENU_requestItemFromPage(gMainMenu, &amp;gMainMenu_wifi);
+    ret |= MENU_setItemText(gMainMenu_wifi, PSTR(&quot;WIFI SETTING&quot;), TEXT_FLASH);
+    //申请wifi页子菜单
+    ret |= MENU_requestPage(&amp;gWifiMenu);
+    ret |= MENU_setPageTitle(gWifiMenu,PSTR(&quot;WIFI SETTING&quot;), TEXT_FLASH);
+    //返回上一菜单
+    ret |= MENU_requestItemFromPage(gWifiMenu, &amp;gWifiMenu_goBack);
+    ret |= MENU_setItemText(gWifiMenu_goBack, PSTR(&quot;GO BACK&quot;), TEXT_FLASH);
+    //将主菜单注册为返回条目的子菜单
+    ret |= MENU_setItemSubPage(gWifiMenu_goBack, gMainMenu);
+    //为wifi添加wifi ssid设置菜单
+    ret |= MENU_requestItemFromPage(gWifiMenu, &amp;gWifiMenu_connect);
+    ret |= MENU_setItemText(gWifiMenu_connect, PSTR(&quot;CONNECT&quot;), TEXT_FLASH);
+    ret |= MENU_setItemEvent(gWifiMenu_connect, APP_wifiConnect, NULL);
+    
+    ret |= MENU_requestItemFromPage(gWifiMenu, &amp;gWifiMenu_ssid);
+    ret |= MENU_setItemText(gWifiMenu_ssid, PSTR(&quot;SSID&quot;), TEXT_FLASH);
+    ret |= MENU_setItemEvent(gWifiMenu_ssid, APP_wifiSetSSID, NULL);
+
+    ret |= MENU_requestItemFromPage(gWifiMenu, &amp;gWifiMenu_password);
+    ret |= MENU_setItemText(gWifiMenu_password, PSTR(&quot;PASSWORD&quot;), TEXT_FLASH);
+    ret |= MENU_setItemEvent(gWifiMenu_password, APP_wifiSetPSWD, NULL);
+
+    ret |= MENU_requestItemFromPage(gWifiMenu, &amp;gWifiMenu_srvIp);
+    ret |= MENU_setItemText(gWifiMenu_srvIp, PSTR(&quot;SERVER IP&quot;), TEXT_FLASH);
+    ret |= MENU_setItemEvent(gWifiMenu_srvIp, APP_wifiSetSrvIp, NULL);
+
+    
+    ret |= MENU_requestItemFromPage(gWifiMenu, &amp;gWifiMenu_devId);
+    ret |= MENU_setItemText(gWifiMenu_devId, PSTR(&quot;DEVICE ID&quot;), TEXT_FLASH);
+    ret |= MENU_setItemEvent(gWifiMenu_devId, APP_wifiSetDevID, NULL);
+
+    
+    //将wifi申请的子菜单注册到主菜单中去
+    ret |= MENU_setItemSubPage(gMainMenu_wifi, gWifiMenu);
+    if(ret)
+    {
+       dbgMsg(&quot;wifi fail&quot;);
+       goto ERR_OUT;
+    }
+    
+    posHandle = gMainMenu;
+    ret = MENU_render(posHandle);
+
+    if(ret)
+    {
+       dbgMsg(&quot;rendert fail&quot;);
+       goto ERR_OUT;
+    }
+
+    APP_dumpPrms();
+    ERR_OUT:
+        return; 
+}
+</code></pre>
+
+<p>代码详见</p>
+
+<p><a href="https://github.com/xifengzui/homebridge-garage2Arduino/tree/master/Arduino%20Code/GC_main">GC_main</a></p>
+
+<p>使用这套菜单可以很快生成自己想要的功能。</p>
+
+<p><img src="http://ojildssc5.bkt.clouddn.com/homebridge_ui.png" alt="UI界面" /></p>
+
+<div style="overflow:auto;-webkit-overflow-scrolling:touch;">
+    <iframe id="XMjc5NjU5ODE4MA=="  class="iframe-video" src='http://player.youku.com/embed/XMjc5NjU5ODE4MA==' frameborder=0 allowfullscreen>
+    </iframe>
+</div>
+<script type="text/javascript">
+    if(screen.width<620)
+    {
+        document.getElementById("XMjc5NjU5ODE4MA==").width = width;
+        document.getElementById("XMjc5NjU5ODE4MA==").height = document.getElementById("XMjc5NjU5ODE4MA==").scrollWidth*9/16+'px';
+    }
+    else
+    {
+        document.getElementById("XMjc5NjU5ODE4MA==").height = document.getElementById("XMjc5NjU5ODE4MA==").scrollWidth*9/16+'px';
+    }
+    
+</script>
+
+
+<p>代码中有比较全的注释，大家可以参考</p>
+
+<p>IDE为Arduino 1.8+版本IDE</p>
+
+<p>参考资料:</p>
+
+<p>nodejs 和 homeBridge的关系: <a href="http://www.tuicool.com/articles/uM3q2yR">http://www.tuicool.com/articles/uM3q2yR</a></p>
+
+<p>github homeBridge: <a href="https://github.com/nfarina/homebridge">https://github.com/nfarina/homebridge</a></p>
+
+<p>使用homeBridge 接入yeelight: <a href="http://sspai.com/36617?utm_source=tuicool&amp;utm_medium=referral">http://sspai.com/36617?utm_source=tuicool&amp;utm_medium=referral</a></p>
+
+<p>SINFUL IPHONE - Error Ignore: <a href="http://www.sinfuliphone.com/showthread.php?t=10082231">http://www.sinfuliphone.com/showthread.php?t=10082231</a></p>
+
+<p>NPM上树莓派控制车库门: <a href="https://www.npmjs.com/package/homebridge-rasppi-gpio-garagedoor﻿">https://www.npmjs.com/package/homebridge-rasppi-gpio-garagedoor﻿</a></p>
+
+<p>NPM上一个简单的车库门控制器: <a href="https://www.npmjs.com/package/homebridge-real-fake-garage-doors">https://www.npmjs.com/package/homebridge-real-fake-garage-doors</a></p>
+
+<p>特别感谢
+GanLuo96214</p>
+
+<p>有意见或建议请发送邮件至xifengzui@yeah.net
+如果您想要索取免费主板也可以发邮件到我的邮箱。</p>
+
+
+				<span class="ref-txt">原创文章，如需转载引用请注明 "本文章首发于惜枫醉的个人博客: http://arkis.me"</span>
+				
+				
+				<div class ="post-donate">
+					<div id="donate_board" class="donate_bar center">
+						<a id="btn_donate" class="btn_donate" href="javascript:;" title="打赏"></a>
+						<span class="donate_txt">
+						   觉得文章有用的话，请随意打赏。您的支持将鼓励我继续创作！
+						</span>
+						<br>
+					</div>
+
+					<div id="donate_guide" class="donate_bar center hidden" >
+						<form action="https://shenghuo.alipay.com/send/payment/fill.htm"
+							method="POST" target="_blank" accept-charset="GBK">
+							<input name="optEmail" type="hidden" value="359939992@qq.com" />
+							<input name="payAmount" type="hidden" value="1" />
+							<input id="title" name="title" type="hidden" value="打赏惜枫醉的文章" />
+							<input name="memo" type="hidden" value="留下您的大名及联系方式(email,wechat,weibo)，多交流共勉共进。" />
+							<input name="pay" type="image" value="转账"
+								src="https://img.alipay.com/sys/personalprod/style/mc/btn-index.png" />
+						</form>
+
+						
+						<img src="http://ojildssc5.bkt.clouddn.com/alipay_scan_code.jpg" alt="支付宝打赏">
+						
+						<img src="http://ojildssc5.bkt.clouddn.com/wechat_scan_code.jpg" alt="微信打赏">
+						<span class="donate_txt">
+								请简单粗暴地爱我
+						</span>
+					</div>
+					<script type="text/javascript">
+						document.getElementById('btn_donate').onclick = function(){
+							document.getElementById('donate_board').remove(this);
+							document.getElementById('donate_guide').setAttribute("class","donate_bar center");
+						}
+					</script>
+				</div>
+
+				
+				<div id="lv-container" data-id="city" data-uid="MTAyMC8zMTcxMC84Mjc0">
+						<script type="text/javascript">
+					(function(d, s) {
+						var j, e = d.getElementsByTagName(s)[0];
+					
+						if (typeof LivereTower === 'function') { return; }
+					
+						j = d.createElement(s);
+						j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+						j.async = true;
+					
+						e.parentNode.insertBefore(j, e);
+					})(document, 'script');
+						</script>
+					<noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
+				</div>
+				
+				
+				
+			</section>
+		</article>
+	</main>
+
+
+	<footer role="contentinfo">
+		<div class="hr"></div>
+		<div class="footer-link">
+			<a href="mailto:xifengzui@yeah.net" target="_blank">Email</a>
+			
+			
+			<a href="https://github.com/xifengzui" target="_blank">GitHub</a>
+			<a href="https://www.weibo.com/malermad" target="_blank">微博</a>
+			
+			<a href="/about" target="_blank">关于</a>
+		</div>
+		<div class="copyright">Copyright &copy; 惜枫醉 All rights reserved.</div>
+	</footer>
+
+</div>
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+</body>
+</html>

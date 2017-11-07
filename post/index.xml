@@ -7,10 +7,24 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-CN</language>
     <copyright>惜枫醉 All rights reserved.</copyright>
-    <lastBuildDate>Mon, 06 Nov 2017 19:51:52 +0800</lastBuildDate>
+    <lastBuildDate>Tue, 07 Nov 2017 15:04:21 +0800</lastBuildDate>
     
 	<atom:link href="http://arkis.me/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>用Caddy和Hugo搭建自己的博客</title>
+      <link>http://arkis.me/post/0010-hugocaddy/</link>
+      <pubDate>Tue, 07 Nov 2017 15:04:21 +0800</pubDate>
+      
+      <guid>http://arkis.me/post/0010-hugocaddy/</guid>
+      <description>hugo作为一个轻客户端，摆脱了hexo的运行环境的问题，只要一个hugo.exe就能立即生成。我觉得这种非常适合我。我没时间去折腾前端的内容，只想安心写文章。这个属性在caddy上也一样，caddy简单到发指的配置我最喜欢了。可以让我分分钟建立一个https站点。
+纯写文章，支持视频、图片等媒体。写完后直接可以生成并且发布。发布后网站立即更新，网站强制为https。
+能看到这篇文章相信都不是小白，就不多说前验知识了。用hugo搭建网页可以参考hexo，都是使用静态网页生成的方式进行。
+在海外vps上安装caddy。然后配置一个目录作为www目录。按照caddy的要求配置tls相关内容。不超过5行配置文件。
+然后就是利用github作为中转站。每当我把新的网页推送的github后，vps就会更新网站内容。具体就是vps每隔一定的时间进行github的pull操作，更新本地www目录。
+我的所有文章都以md的方式存在。并在本地使用同步盘备份，所以理论上是非常可靠的。现在还差一点就是随时随地写文章，我计划将在nas上做一个小工具，检测md文件是否新增或者变化，一旦发生变化调用hugo进行网站生成然后发布到github上。敬请期待。</description>
+    </item>
     
     <item>
       <title>Hugo解决iframe优酷视频美观问题之灵活使用shortcodes</title>

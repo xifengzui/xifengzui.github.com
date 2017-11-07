@@ -23,6 +23,7 @@ img {
   width:100%;
   border-radius: 10px;
   overflow: hidden;
+  min-height: 400px;
 }
 
 header,
@@ -36,7 +37,7 @@ main {
 }
 
 .container {
-  width: 90%;
+  width: 95%;
   max-width: 720px;
 }
 

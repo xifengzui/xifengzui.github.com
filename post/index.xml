@@ -7,10 +7,22 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-CN</language>
     <copyright>惜枫醉 All rights reserved.</copyright>
-    <lastBuildDate>Tue, 07 Nov 2017 15:04:21 +0800</lastBuildDate>
+    <lastBuildDate>Wed, 08 Nov 2017 08:52:43 +0800</lastBuildDate>
     
 	<atom:link href="http://arkis.me/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>安且吉兮--安吉双一村</title>
+      <link>http://arkis.me/post/0011-anjishuangyicun/</link>
+      <pubDate>Wed, 08 Nov 2017 08:52:43 +0800</pubDate>
+      
+      <guid>http://arkis.me/post/0011-anjishuangyicun/</guid>
+      <description>document.getElementById(&#34;XMzE0MjQ2Mzk1Ng==&#34;).height = document.getElementById(&#34;XMzE0MjQ2Mzk1Ng==&#34;).scrollWidth*9/16+&#39;px&#39;; 秋天的天气非常好，萌生了去外出拍摄的想法。选定了目的地浙江省安吉县双一村。过去后风特别大，适合拍摄动态。 于是就有了这个作品。优酷画质压缩的厉害。超更漂亮。
+全程使用松下相机GH4 vlog-l模式拍摄，14-140mm狗头，单杆稳定，有些镜头还是有些抖动， 调色和稳定用的达芬奇，还在熟悉软件当中，有几个镜头没有找到合适的调色逻辑。
+录音设备使用的是DR-05 屌丝神器。也是第一次尝试在视频加入环境声音，还要多加练习。
+希望各位看官喜欢。</description>
+    </item>
     
     <item>
       <title>用Caddy和Hugo搭建自己的博客</title>

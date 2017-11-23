@@ -7,10 +7,26 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-CN</language>
     <copyright>惜枫醉 All rights reserved.</copyright>
-    <lastBuildDate>Thu, 23 Nov 2017 09:00:35 +0800</lastBuildDate>
+    <lastBuildDate>Thu, 23 Nov 2017 20:46:41 +0800</lastBuildDate>
     
 	<atom:link href="http://arkis.me/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>深入浅出的深度学习基础教程</title>
+      <link>http://arkis.me/post/0014-deeplearningtutorial/</link>
+      <pubDate>Thu, 23 Nov 2017 20:46:41 +0800</pubDate>
+      
+      <guid>http://arkis.me/post/0014-deeplearningtutorial/</guid>
+      <description>朋友，听说你听过深度学习神经网络，除了感觉高大上，似乎觉得不能学会？是时候了解下了。
+3Blue1Brown是著名的油管大佬，发布了很多非常非常非常好的直观而且易懂的数学教程。最近大佬专门针对深度学习发布了4个基础的视频教程，直观的给我们讲解展示了深度学习。如此真正的深入浅出，可以让初学者有了一个非常直观和感性的认识。
+以下四集，对于理解入门，我想找不到更加通俗易懂的教程了。推荐大家看一下。看不懂我请你吃饭。
+第一集:深度学习之神经网络的结构 document.getElementById(&#34;15532370_page1&#34;).height = document.getElementById(&#34;15532370_page1&#34;).scrollWidth*11.3/16+&#39;px&#39;; 
+第二集:深度学习之梯度下降
+document.getElementById(&#34;16144388_page1&#34;).height = document.getElementById(&#34;16144388_page1&#34;).scrollWidth*11.3/16+&#39;px&#39;;  第三集上:深度学习之反向传播算法-直观理解
+document.getElementById(&#34;16577449_page1&#34;).height = document.getElementById(&#34;16577449_page1&#34;).scrollWidth*11.3/16+&#39;px&#39;;  第三集下:深度学习之反向传播算法-do some math
+document.getElementById(&#34;16577449_page2&#34;).height = document.getElementById(&#34;16577449_page2&#34;).scrollWidth*11.3/16+&#39;px&#39;;  </description>
+    </item>
     
     <item>
       <title>Source Insight 4.0 注释插件</title>

@@ -7,17 +7,49 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-CN</language>
     <copyright>惜枫醉 All rights reserved.</copyright>
-    <lastBuildDate>Tue, 14 Nov 2017 09:55:20 +0800</lastBuildDate>
+    <lastBuildDate>Thu, 23 Nov 2017 09:00:35 +0800</lastBuildDate>
     
 	<atom:link href="http://arkis.me/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
+      <title>Source Insight 4.0 注释插件</title>
+      <link>http://arkis.me/post/0013-sourceinsight4fastcomment/</link>
+      <pubDate>Thu, 23 Nov 2017 09:00:35 +0800</pubDate>
+      
+      <guid>http://arkis.me/post/0013-sourceinsight4fastcomment/</guid>
+      <description>网上一直流行华为的插件注释宏工具，很好用，但问题是不能用在Source Insight 4.0以后的版本。对我来说快速注释已经离不开了，所以很久以前我参见网上的其他版本的快速宏注释，修改了一个我自己用的宏工具。伴随着多次电脑更新和重装，感觉还是将这个宏以文章的形式发布到网上，方便自己和大家以后参照使用。
+我取名 fastComment.em 点此下载
+使用方法如下
+Step1.
+下载fastComment.em到项目文件夹下项目位置在文档&amp;ndash;&amp;gt;Source Insight 4.0\Project\Base 目录下。
+Step2.
+打开Si软件，并打开默认工程Base。在Project &amp;ndash;&amp;gt; Open Project下。
+Step3.
+添加fastComment.em到Base的项目工程下。右键Project Files 窗口 &amp;ndash;&amp;gt; Add and Remove Project Files。选择fastComment.em，默认项目位置在文档&amp;ndash;&amp;gt;Source Insight 4.0\Project\Base 目录下，然后添加。
+Step4.
+重新编译Base 项目。在Project &amp;ndash;&amp;gt; Rebuilt Project
+Step5.
+注册热键。在Option &amp;ndash;&amp;gt; Key Assignment下面，找到下面几个宏
+Macro:hh_get_author_name 第一次注释的时候会提示作者信息输入，以后默认都是该作者了。不需要注册快捷键。
+Macro:hh_InsertFileHeader 代表文件注释，就是生成完整的文件注释头。注册快捷键。
+Macro:hh_InsertFuncHeader代表函数注释，生产完整的函数注释。注册快捷键。
+点击 Assign New Key&amp;hellip; 注册你自己定义的快捷键，按提示操作。 我习惯使用Ctrl +Shift+Enter生成文件注释头。用Ctrl+Enter生成函数注释头。最后注意保存一下工程。
+Step6.
+以上几步骤，插件就装完了，以后编辑文件的时候可以直接使用快捷键来生成注释了。
+注意:
+1.函数注释的话，光标要落到你要注释的函数上，才能够生成注释。
+2.文件保存后才能够注释。
+以下是一个快捷注释的例子，大家可以根据自己的需求，修改这几个注释宏的内容。
+/***************************************************************************** * File : test.c * Author : 惜枫醉 * Date : 2017/11/23 * Brief : * * Copyright (c) 2000-2020 惜枫醉 All Rights Reserved.</description>
+    </item>
+    
+    <item>
       <title>第五届无人飞行器创意大赛</title>
-      <link>http://arkis.me/post/0012-5thcreativedronesevent/</link>
+      <link>http://arkis.me/post/0012-5thdron/</link>
       <pubDate>Tue, 14 Nov 2017 09:55:20 +0800</pubDate>
       
-      <guid>http://arkis.me/post/0012-5thcreativedronesevent/</guid>
+      <guid>http://arkis.me/post/0012-5thdron/</guid>
       <description>document.getElementById(&#34;XMzE1NjM5NzI5Mg==&#34;).height = document.getElementById(&#34;XMzE1NjM5NzI5Mg==&#34;).scrollWidth*9/16+&#39;px&#39;; 第五届无人飞行器创意大赛在安吉举办了。作为一个本地人，而且是个技术控，肯定要去看看啊。
 无人机自组网编队非常壮观，一直很好奇这种近距离相对定位是怎么实现的，目前室内定位一直没啥进展，不知道为什么。 直升机暴力表演还是很过瘾的。随意在三位空间像布朗运动似的。还有小伙伴们一言不合飞长条板凳，真应老话说的：动力够，门板也能飞。 不过我看的那天，风也大，好多机摔了。
 这届飞行比赛我只看了一天，错过了决赛太可惜了。比赛在现场看的感觉和在朋友圈看照片的感觉是完全不一样的。下次我一定要请假过去看。 大师赛很棒，创意赛有趣。总的来说就是好看。</description>

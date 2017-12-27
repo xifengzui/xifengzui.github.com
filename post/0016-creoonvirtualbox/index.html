@@ -11,7 +11,7 @@
 <link rel="stylesheet" href="/css/skeleton.css">
 <link rel="stylesheet" href="/css/custom.css">
 <link rel="alternate" href="/index.xml" type="application/rss+xml" title="惜枫醉">
-<title>Hugo解决iframe优酷视频美观问题之灵活使用shortcodes - 惜枫醉</title>
+<title>解决Creo在VirtualBox下卡顿问题 - 惜枫醉</title>
 </head>
 <body>
 
@@ -27,53 +27,15 @@
 
 	<main role="main">
 		<article itemscope itemtype="http://arkis.me/about">
-			<h1 class="entry-title" itemprop="headline">Hugo解决iframe优酷视频美观问题之灵活使用shortcodes</h1>
-			<span class="entry-meta"><time itemprop="datePublished" datetime="2017-11-06">2017年11月06日</time></span>
+			<h1 class="entry-title" itemprop="headline">解决Creo在VirtualBox下卡顿问题</h1>
+			<span class="entry-meta"><time itemprop="datePublished" datetime="2017-12-27">2017年12月27日</time></span>
 			<section itemprop="entry-text">
-				<p>最近开始转用hugo进行个人博客的编写了。由于本人是个视频拍摄爱好者。经常会有一些个人剪辑作品发布。因此就需要在站点上嵌入视频。</p>
+				<p>最近因为个人学习需要，我已经将开发环境从windows全面转移到了linux，现在ubuntu已经基本能够适应支持办公了，我估计一般人都不会用，因为毕竟linux，遇到问题肯定还得会敲几下命令。大部分windows下的生产力工具在linux下面都有开源的免费版本，比如office系列或者其他开发工具软件，仍然有部分软件没有，比如设计软件Creo 4.0,作为一个常用的设计软件。我需要学习它，因此我只能在linux发行版Ubuntu上安装虚拟机来虚拟windows，再在虚拟的windows下安装Creo进行个人学习。</p>
 
-<p>问题是国内的这几家视频商，嵌入页面压根就没好好搞。而hugo原生不支持优酷，没办法只有自己想办法来优化。其实说是优化倒不如说是解决iframe的长宽比问题,曾考虑用CSS解决问题，但貌似CSS不支持动态高度。所以解决办法如下。</p>
+<p>安装一路顺利，但问题是启动软件后，虽然视图旋转没有问题，但在使用时，选择面会发生卡顿的情况，我一度以为是因为VBOX的增强工具引起的问题,也尝试修改了主板设置。事实上也确实时VBOX引起的问题。我查阅了很多资料，找到一个解决方案，那就是在配置文件中，增加graphics配置，将渲染API改为win32_gdi，解决了这个问题。</p>
 
-<p>首先我们需要理解 HUGO基于模板的运作方式。<br />
-所有文章内容都依赖于本文所用到的模板。可以简单理解为，我把所有文章的字全部套上模板进行生成。</p>
-
-<p>基于这点我们就可以对统一的优酷外链下手。这里我们需要专门为优酷定制一套模板。</p>
-
-<p>这是优酷传统的外链形式</p>
-
-<pre><code class="language-html">    &lt;iframe height=498 width=510 src='http://player.youku.com/embed/XMTI1OTQ0MTIwNA==' frameborder=0 allowfullscreen&gt;&lt;/iframe&gt;
-</code></pre>
-
-<p>官方文档中写道，模板，即shortcodes有特殊的编写规则</p>
-
-<pre><code>Shortcode templates have a simple lookup order:
-/layouts/shortcodes/&lt;SHORTCODE&gt;.html
-/themes/&lt;THEME&gt;/layouts/shortcodes/&lt;SHORTCODE&gt;.html
-</code></pre>
-
-<p>说明他们必须存在在 这两个位置。就能被识别了。我建一个youku.html 在里边写道</p>
-
-<pre><code class="language-html">&lt;iframe   class=&quot;iframe-video&quot; src='http://player.youku.com/embed/{{ index .Params 0 }}' frameborder=0 allowfullscreen onload=&quot;javascript:this.height = this.scrollWidth*9/16+'px';&quot;&gt;
-&lt;/iframe&gt;
-</code></pre>
-
-<p>建立一个CSS，匹配上面的class要求</p>
-
-<pre><code class="language-css">.iframe-video {
-  width:100%;
-  border-radius: 4px;
-  overflow: hidden;
-}
-</code></pre>
-
-<p>然后在正文中调用，这就是官方推荐的模板调用形式。注意引号，避免问题。</p>
-
-<pre><code class="language-html">{去掉{&lt; youku &quot;XMTI1OTQ0MTIwNA==&quot; &gt;}去掉}
-</code></pre>
-
-<p>这样就解决问题了,记得把上述中文字去掉，hugo似乎看到标签立即替换，我也很无奈。hugo为我们提供了一套完备的模板方案，我们可以指定一段短代码来代替一整段代码。如上我用shortcode对优酷的代码进行了整合。所有优酷的代码只需要一个视频尾巴信息就够了。这就是模板的强大之处。我只是借助模板之力顺便解决了iframe的问题。</p>
-
-<p>如果你也想自己编写hugo的模板，请参考hugo的官方文档 <a href="http://gohugo.io/templates/shortcode-templates/">http://gohugo.io/templates/shortcode-templates/</a></p>
+<p>方法很简单
+文件-&gt;配置-&gt;配置编辑器-&gt;右侧窗口添加-&gt;    内容写graphics(注意creo会自动填充，我们这里就填graphics就好了，它给你填充的都不要) 值填 win32_gdi。</p>
 
 
 				<span class="ref-txt">原创文章，如需转载引用请注明 "本文章首发于惜枫醉的个人博客: http://arkis.me"</span>

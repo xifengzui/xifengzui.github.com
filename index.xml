@@ -7,10 +7,21 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-CN</language>
     <copyright>惜枫醉 All rights reserved.</copyright>
-    <lastBuildDate>Thu, 23 Nov 2017 20:46:41 +0800</lastBuildDate>
+    <lastBuildDate>Wed, 27 Dec 2017 09:41:25 +0800</lastBuildDate>
     
 	<atom:link href="http://arkis.me/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>解决Creo在VirtualBox下卡顿问题</title>
+      <link>http://arkis.me/post/0016-creoonvirtualbox/</link>
+      <pubDate>Wed, 27 Dec 2017 09:41:25 +0800</pubDate>
+      
+      <guid>http://arkis.me/post/0016-creoonvirtualbox/</guid>
+      <description>最近因为个人学习需要，我已经将开发环境从windows全面转移到了linux，现在ubuntu已经基本能够适应支持办公了，我估计一般人都不会用，因为毕竟linux，遇到问题肯定还得会敲几下命令。大部分windows下的生产力工具在linux下面都有开源的免费版本，比如office系列或者其他开发工具软件，仍然有部分软件没有，比如设计软件Creo 4.0,作为一个常用的设计软件。我需要学习它，因此我只能在linux发行版Ubuntu上安装虚拟机来虚拟windows，再在虚拟的windows下安装Creo进行个人学习。
+安装一路顺利，但问题是启动软件后，虽然视图旋转没有问题，但在使用时，选择面会发生卡顿的情况，我一度以为是因为VBOX的增强工具引起的问题,也尝试修改了主板设置。事实上也确实时VBOX引起的问题。我查阅了很多资料，找到一个解决方案，那就是在配置文件中，增加graphics配置，将渲染API改为win32_gdi，解决了这个问题。
+方法很简单 文件-&amp;gt;配置-&amp;gt;配置编辑器-&amp;gt;右侧窗口添加-&amp;gt; 内容写graphics(注意creo会自动填充，我们这里就填graphics就好了，它给你填充的都不要) 值填 win32_gdi。</description>
+    </item>
     
     <item>
       <title>深入浅出的深度学习基础教程</title>

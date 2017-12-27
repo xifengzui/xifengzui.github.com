@@ -11,7 +11,7 @@
 <link rel="stylesheet" href="/css/skeleton.css">
 <link rel="stylesheet" href="/css/custom.css">
 <link rel="alternate" href="/index.xml" type="application/rss+xml" title="惜枫醉">
-<title>Hugo解决iframe优酷视频美观问题之灵活使用shortcodes - 惜枫醉</title>
+<title>泡泡 - 惜枫醉</title>
 </head>
 <body>
 
@@ -27,53 +27,30 @@
 
 	<main role="main">
 		<article itemscope itemtype="http://arkis.me/about">
-			<h1 class="entry-title" itemprop="headline">Hugo解决iframe优酷视频美观问题之灵活使用shortcodes</h1>
-			<span class="entry-meta"><time itemprop="datePublished" datetime="2017-11-06">2017年11月06日</time></span>
+			<h1 class="entry-title" itemprop="headline">泡泡</h1>
+			<span class="entry-meta"><time itemprop="datePublished" datetime="2017-12-01">2017年12月01日</time></span>
 			<section itemprop="entry-text">
-				<p>最近开始转用hugo进行个人博客的编写了。由于本人是个视频拍摄爱好者。经常会有一些个人剪辑作品发布。因此就需要在站点上嵌入视频。</p>
+				<p>​   我活在一个气泡里，在气泡里的我感觉很安全，很舒适，没有压力，没有烦恼。我所从事的都是我熟悉的工作。我所面对的都是我熟悉的人。我所走的路线，都有地图指引。</p>
 
-<p>问题是国内的这几家视频商，嵌入页面压根就没好好搞。而hugo原生不支持优酷，没办法只有自己想办法来优化。其实说是优化倒不如说是解决iframe的长宽比问题,曾考虑用CSS解决问题，但貌似CSS不支持动态高度。所以解决办法如下。</p>
+<p>​   然而在这个泡泡里，我每次都能听到一个特别的声音，尽管声音被我刻意压低，忽略。它就像是焦虑的兄弟，总在说 &ldquo;嘿，尝试下新的东西吧。&rdquo;</p>
 
-<p>首先我们需要理解 HUGO基于模板的运作方式。<br />
-所有文章内容都依赖于本文所用到的模板。可以简单理解为，我把所有文章的字全部套上模板进行生成。</p>
+<p>​   一旦你注意到这个声音了，他们就开始转移你的注意力，他们开始用手机榨干你的碎片时间，用垃圾信息填满你的大脑，用明星从你身体上抽取养料，你的爱恨情仇，被丢到了社交平台的垃圾桶里。获得一两个赞，然后心满意足的关掉床头灯睡觉，第二天睁开你充满血丝的眼睛，回到了你的循环。</p>
 
-<p>基于这点我们就可以对统一的优酷外链下手。这里我们需要专门为优酷定制一套模板。</p>
+<p>​   问下你自己，这是自己想要的么？</p>
 
-<p>这是优酷传统的外链形式</p>
+<p>​   问一下我自己，开心么？</p>
 
-<pre><code class="language-html">    &lt;iframe height=498 width=510 src='http://player.youku.com/embed/XMTI1OTQ0MTIwNA==' frameborder=0 allowfullscreen&gt;&lt;/iframe&gt;
-</code></pre>
+<p>​   不，我不开心，我焦虑。他们告诉我：&rdquo;这就是社会，你习惯就好。&rdquo;我撸起袖子，想对着他们破口大骂，他们笑着挥了挥手，把我拉黑，说我还太年轻，看不到这个社会不是非黑即白的。其他的泡泡，也点了点头。我沉默了，思索了一会儿，是不是自己弄错了什么？然后看到一个大佬的一句话。我觉得有道理，罢了罢了，不再想了。缩进了自己的泡泡。焦虑很开心，因为它厌氧。泡泡里很适合它，而我就是它的养料。</p>
 
-<p>官方文档中写道，模板，即shortcodes有特殊的编写规则</p>
+<p>​   疼痛。</p>
 
-<pre><code>Shortcode templates have a simple lookup order:
-/layouts/shortcodes/&lt;SHORTCODE&gt;.html
-/themes/&lt;THEME&gt;/layouts/shortcodes/&lt;SHORTCODE&gt;.html
-</code></pre>
+<p>​   突然睁开眼，发现自己已经瘦骨嶙峋。我想，应该站起来了。</p>
 
-<p>说明他们必须存在在 这两个位置。就能被识别了。我建一个youku.html 在里边写道</p>
+<p>​   而他们，又来了。</p>
 
-<pre><code class="language-html">&lt;iframe   class=&quot;iframe-video&quot; src='http://player.youku.com/embed/{{ index .Params 0 }}' frameborder=0 allowfullscreen onload=&quot;javascript:this.height = this.scrollWidth*9/16+'px';&quot;&gt;
-&lt;/iframe&gt;
-</code></pre>
+<p>​</p>
 
-<p>建立一个CSS，匹配上面的class要求</p>
-
-<pre><code class="language-css">.iframe-video {
-  width:100%;
-  border-radius: 4px;
-  overflow: hidden;
-}
-</code></pre>
-
-<p>然后在正文中调用，这就是官方推荐的模板调用形式。注意引号，避免问题。</p>
-
-<pre><code class="language-html">{去掉{&lt; youku &quot;XMTI1OTQ0MTIwNA==&quot; &gt;}去掉}
-</code></pre>
-
-<p>这样就解决问题了,记得把上述中文字去掉，hugo似乎看到标签立即替换，我也很无奈。hugo为我们提供了一套完备的模板方案，我们可以指定一段短代码来代替一整段代码。如上我用shortcode对优酷的代码进行了整合。所有优酷的代码只需要一个视频尾巴信息就够了。这就是模板的强大之处。我只是借助模板之力顺便解决了iframe的问题。</p>
-
-<p>如果你也想自己编写hugo的模板，请参考hugo的官方文档 <a href="http://gohugo.io/templates/shortcode-templates/">http://gohugo.io/templates/shortcode-templates/</a></p>
+<p>​</p>
 
 
 				<span class="ref-txt">原创文章，如需转载引用请注明 "本文章首发于惜枫醉的个人博客: http://arkis.me"</span>

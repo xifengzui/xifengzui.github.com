@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,height=device-height, user-scalable=no,initial-scale=1, minimum-scale=1, maximum-scale=1,target-densitydpi=device-dpi ">
+<meta name="generator" content="Hugo 0.31.1" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="fonts.lug.ustc.edu.cn/css?family=Roboto:400,700" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/github.min.css">
+<link rel="stylesheet" href="/css/normalize.css">
+<link rel="stylesheet" href="/css/skeleton.css">
+<link rel="stylesheet" href="/css/custom.css">
+<link rel="alternate" href="/index.xml" type="application/rss+xml" title="惜枫醉">
+<title>记一次kicad打开元件封装库卡死cvPCB瞎折腾的过程 其一 - 惜枫醉</title>
+</head>
+<body>
+
+<div class="container">
+
+	<header role="banner">
+		<div class="header-logo">
+			<a href="/"><img src="https://s.gravatar.com/avatar/45de30c48912968eb292222014b646e8?s=200" width="60" height="60" alt="惜枫醉"></a>
+		</div>
+		
+	</header>
+
+
+	<main role="main">
+		<article itemscope itemtype="http://arkis.me/about">
+			<h1 class="entry-title" itemprop="headline">记一次kicad打开元件封装库卡死cvPCB瞎折腾的过程 其一</h1>
+			<span class="entry-meta"><time itemprop="datePublished" datetime="2017-12-29">2017年12月29日</time></span>
+			<section itemprop="entry-text">
+				<p>××声明：以下过程大部分都是瞎折腾，试错过程。××</p>
+
+<p>我现在工作环境现在全部转移到了Linux，最近在学习开源的制板软件Kicad，这个软件现在已经比较完善了，我用的是linux版本4.0.7，学习过程中，原理图已经绘制完毕，需要使用封装库管理。我的软件点击Run CvPCB to associate components and footprints 就会卡死。我就研究下。</p>
+
+<p>经过一番查询和试错后我大概可以确定了，其实cvPCB会使用在线的github官方源更新封装库，而且会在下载的时候顺便解压。我的电脑会卡死在这里，这貌似是cvPCB大家都比较困扰的一个问题，这个模块是单线程运行的。具体大家可以参见在windows下的解决方案，<a href="http://blog.csdn.net/liangjiapei/article/details/53910340">链接:kicad卡死，cvpcb卡死，kicad封装库库设置</a>。</p>
+
+<p>在ubuntu desktop下，要解决这个问题，简单粗暴的办法是kicad的配置文件在目录/etc/profile.d/下面 有一个kicad-env.sh
+既然只是因为无法下载导致的卡死，那么删了github相关的描述就可以跑了.然后在cvPCB弹出的窗口中把库配置到本地的默认安装时候的库。</p>
+
+<pre><code class="language-shell">$sudo vim  /etc/profile.d/kicad-env.sh
+</code></pre>
+
+<pre><code class="language-shell"># Env var for kicad github plugin
+#注释掉github环境变量 留空
+#export KIGITHUB=&quot;https://github.com/KiCad&quot; 
+export KIGITHUB=&quot;&quot; 
+# Env var for kicad pcbnew plugins
+export KICAD_PATH=/usr/share/kicad
+
+</code></pre>
+
+<p>这样启动就会弹出错误对话框</p>
+
+<p><img src="http://ojildssc5.bkt.clouddn.com/kicad%20Error.png" alt="KICAD ERROR" /></p>
+
+<p>基本上就是github没法连接，库搞不到。下面就是稍微修改下设置，基本问题就没有了。</p>
+
+<p>这时候，我开始怀疑是否是因为github在海外，所以它解析特别慢？
+带着这个疑问我开始折腾一个简单的方案，问了几个小伙伴，开始镜像海外的kicad相关库。
+我看了下国内的类github平台有
+诸如coding.net和gitee.com。coding不能直接从github迁移，gitee可以。
+我尝试fork官方库，并且导入到了gitee的库。然后觉得万事大吉的时候，点了下载zip，gitee弹出了一个</p>
+
+<p><img src="http://ojildssc5.bkt.clouddn.com/%E5%B0%8F%E6%B0%94%E5%93%A6.jpg" alt="验证码" /></p>
+
+<p><img src="http://ojildssc5.bkt.clouddn.com/emmm.jpg" alt="emmm" />  X 1</p>
+
+<p>尝试wget 直接给我404&hellip;.好吧，这方案我看是不行了。</p>
+
+<p>后面我点开了github官方页，查看了一番，发现有些库官方自己没有维护了。已经转移到了repo里。这些库还存在的目的就是为了兼容4.0版本。</p>
+
+<p><img src="http://ojildssc5.bkt.clouddn.com/emmm.jpg" alt="emmm" />  X 2</p>
+
+<p>所以基本上，我觉得镜像库的目的已经不大了。</p>
+
+<p>后面我就去看了kicad的源代码。看看KICAD在cvPCB这块怎么处理的。
+可以看到一名叫JP Charras 对这部分的代码加了如下的注释。</p>
+
+<pre><code class="language-c">/*
+ *  While creating a wizard to edit the fp lib tables, and mainly the web viewer
+ *  which can read the list of pretty library on a github repos, I was told there is
+ *  this URL to retrieve info from any particular repo:
+ *
+ *  https://api.github.com/orgs/KiCad/repos
+ *  or
+ *  https://api.github.com/users/KiCad/repos
+ *
+ *  This gets just information on the repo in JSON format.
+ *
+ *  I used avhttp, already used in the pcbnew Github plugin to download
+ *  the json file.
+ *
+ *  JP Charras.
+ */
+</code></pre>
+
+<p>他通过使用github的api获得 kicad官方的 repo的json参数，然后使用avhttp进行解析用在在线库的向导代码里。除非其他博客也提供了api，否则就不可以在其他的类github站搭服务器了。基本证明我前面在白费功夫。</p>
+
+<p><img src="http://ojildssc5.bkt.clouddn.com/emmm.jpg" alt="emmm" />  X 3</p>
+
+<p>具体可以大家参考一下源代码中 github_getliblist.cpp</p>
+
+<p><a href="https://github.com/KiCad/kicad-source-mirror">链接: KiCAD Source Mirror</a></p>
+
+<p>现在看源码下来，我觉得想借类Github站实现国内镜像的方式是不可行的。阅读了源代码以后发现其实可以自己编写插件支持国内源的方式。写到这里我把文章的标题加了个“其一”，我想我应该会在某一天把国内的一个源加进去，希望这一天早日到来，我能写“其二”（挖坑），也算可以为开源社区做贡献了。</p>
+
+
+				<span class="ref-txt">原创文章，如需转载引用请注明 "本文章首发于惜枫醉的个人博客: http://arkis.me"</span>
+				
+				
+				<div class ="post-donate">
+					<div id="donate_board" class="donate_bar center">
+						<a id="btn_donate" class="btn_donate" href="javascript:;" title="打赏"></a>
+						<span class="donate_txt">
+						   觉得文章有用的话，请随意打赏。您的支持将鼓励我继续创作！
+						</span>
+						<br>
+					</div>
+
+					<div id="donate_guide" class="donate_bar center hidden" >
+						<form action="https://shenghuo.alipay.com/send/payment/fill.htm"
+							method="POST" target="_blank" accept-charset="GBK">
+							<input name="optEmail" type="hidden" value="359939992@qq.com" />
+							<input name="payAmount" type="hidden" value="1" />
+							<input id="title" name="title" type="hidden" value="打赏惜枫醉的文章" />
+							<input name="memo" type="hidden" value="留下您的大名及联系方式(email,wechat,weibo)，多交流共勉共进。" />
+							<input name="pay" type="image" value="转账"
+								src="https://img.alipay.com/sys/personalprod/style/mc/btn-index.png" />
+						</form>
+
+						
+						<img src="http://ojildssc5.bkt.clouddn.com/alipay_scan_code.jpg" alt="支付宝打赏">
+						
+						<img src="http://ojildssc5.bkt.clouddn.com/wechat_scan_code.jpg" alt="微信打赏">
+						<span class="donate_txt">
+								请简单粗暴地爱我
+						</span>
+					</div>
+					<script type="text/javascript">
+						document.getElementById('btn_donate').onclick = function(){
+							document.getElementById('donate_board').remove(this);
+							document.getElementById('donate_guide').setAttribute("class","donate_bar center");
+						}
+					</script>
+				</div>
+				
+
+				
+				<div id="lv-container" data-id="city" data-uid="MTAyMC8zMTcxMC84Mjc0">
+						<script type="text/javascript">
+					(function(d, s) {
+						var j, e = d.getElementsByTagName(s)[0];
+					
+						if (typeof LivereTower === 'function') { return; }
+					
+						j = d.createElement(s);
+						j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+						j.async = true;
+					
+						e.parentNode.insertBefore(j, e);
+					})(document, 'script');
+						</script>
+					<noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
+				</div>
+				
+			
+			<script type="text/javascript">
+				(function(){
+					var bp = document.createElement('script');
+					var curProtocol = window.location.protocol.split(':')[0];
+					if (curProtocol === 'https') {
+						bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+					}
+					else {
+						bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+					}
+					var s = document.getElementsByTagName("script")[0];
+					s.parentNode.insertBefore(bp, s);
+				})();
+			</script>
+			</section>
+		</article>
+	</main>
+
+
+	<footer role="contentinfo">
+		<div class="hr"></div>
+		<div class="footer-link">
+			<a href="mailto:xifengzui@yeah.net" target="_blank">Email</a>
+			
+			
+			<a href="https://github.com/xifengzui" target="_blank">GitHub</a>
+			<a href="https://www.weibo.com/malermad" target="_blank">微博</a>
+			
+			<a href="/about" target="_blank">关于</a>
+		</div>
+		<div class="copyright">Copyright &copy; 惜枫醉 All rights reserved.</div>
+	</footer>
+
+</div>
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+</body>
+</html>

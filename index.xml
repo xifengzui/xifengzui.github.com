@@ -7,10 +7,39 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-CN</language>
     <copyright>惜枫醉 All rights reserved.</copyright>
-    <lastBuildDate>Fri, 29 Dec 2017 20:01:28 +0800</lastBuildDate>
+    <lastBuildDate>Sun, 25 Feb 2018 03:33:28 +0800</lastBuildDate>
     
 	<atom:link href="http://arkis.me/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>在EdgeMAX EdgeRouter ERX路由器原生系统上搭建透明代理</title>
+      <link>http://arkis.me/post/0018-erxproxy/</link>
+      <pubDate>Sun, 25 Feb 2018 03:33:28 +0800</pubDate>
+      
+      <guid>http://arkis.me/post/0018-erxproxy/</guid>
+      <description>每个能使用技术达到自己目的的人，都要考虑能否坚持自己的原则，做不到，请不要尝试。
+我写这篇文章的主要原因就是方便自己，以后在遇到特殊的情况诸如雷击之类的灾害时，不至于重新再来翻阅资料一遍，如果你有任何问题，可以留言，或者翻阅官方资料，我更推荐官方资料，因为人家资料齐全。我这个教程只通过我手头有的mipsel架构的路由器进行的操作，当然你可以举一反三，自行的架设在其他路由上。
+我喜欢翻阅电子技术及互联网技术的相关资料，由于众所周知的原因，在防火墙内访问一些技术站点通常会遇到速度慢或404等问题。之前都是简单的搭建一个\$\$服务让PC可以使用。
+现在这次的目的是在家庭里搭建一个网关，让所有的设备包括手机、电脑、PS4等都可以做到无感知访问相关站点，即一劳永逸，避免重复设置。 方案选择了V2RAY,以下我都用Ray来代替。
+Ray相比于其他Chi**DNS \$\$ -redir \$\$-tunnel KCPtun的混合体来说，操作更加简便，当然配置也会相对复杂，不过理解了思路后，会有一种豁然开朗的感觉。事实上我没仔细关它的实现方式,，我大致理解了其逻辑，如果大家有兴趣完全可以参考官方站点搭建灵活的科学实验工具。 我这里只是简单的按照官方推荐的教程，搭建了家里的透明代理。大约花了我2小时的时间。
+材料
+1.一台EdgeMax ERX路由器。
+这个路由器在2017年我给了她很高很高的评价，作为一个不到300块的路由器，带有POE供电、256M的Flash、256M的RAM，原生debian系统。处理器是MT7621,带硬件转发。我觉得是相当值了，可玩性也非常高。而且重点是它不带无线！我非常喜欢，我就想有个简单可靠的铁盒子放在弱电箱里。
+2.一台防火墙外的服务器
+给你提供出路。
+3.不怕失败的决心。
+操作步骤
+0.开篇注意事项
+服务器时间和路由器时间保持一致，时区没有关系，精确至分钟即可。
+确保你的路由器有支持的Ray版本，如果不支持，你可能得下载源码自己编译。
+Ray对硬件要求也挺高的，至少需要32M的内存，推荐64M或更多的内存，如果你的内存不足，还是洗洗睡觉吧不要熬夜看ray了，不行的。
+如果你配置文件一般在哪里都不知道的话，我建议你查询互联网或者稍微补充一下linux基础，这篇文章可能不适合你。
+1.在服务器上搭建Ray。
+使用SSH登陆海外linux服务器 运行脚本直接安装。
+bash &amp;lt;(curl -L -s https://install.direct/go.sh)  使用如下配置文件
+{ &amp;quot;log&amp;quot; : { &amp;quot;access&amp;quot;: &amp;quot;/var/log/v2ray/access.log&amp;quot;, &amp;quot;error&amp;quot;: &amp;quot;/var/log/v2ray/error.log&amp;quot;, &amp;quot;loglevel&amp;quot;: &amp;quot;warning&amp;quot; }, &amp;quot;inbound&amp;quot;: { &amp;quot;port&amp;quot;: 443, &amp;quot;protocol&amp;quot;: &amp;quot;vmess&amp;quot;, &amp;quot;settings&amp;quot;: { &amp;quot;clients&amp;quot;: [ { &amp;quot;id&amp;quot;: &amp;quot;你自己的UUID&amp;quot;, &amp;quot;level&amp;quot;: 1, &amp;quot;alterId&amp;quot;: 64 } ], &amp;quot;detour&amp;quot;: { &amp;quot;to&amp;quot;: &amp;quot;dynamicPort&amp;quot; } } }, &amp;quot;inboundDetour&amp;quot;:[ { &amp;quot;protocol&amp;quot;: &amp;quot;vmess&amp;quot;, &amp;quot;port&amp;quot;: &amp;quot;10000-20000&amp;quot;, &amp;quot;tag&amp;quot;: &amp;quot;dynamicPort&amp;quot;, &amp;quot;settings&amp;quot;: { &amp;quot;default&amp;quot;: { &amp;quot;level&amp;quot;: 1, &amp;quot;alterId&amp;quot;: 32 } }, &amp;quot;allocate&amp;quot;: { &amp;quot;strategy&amp;quot;: &amp;quot;random&amp;quot;, &amp;quot;concurrency&amp;quot;: 2, &amp;quot;refresh&amp;quot;: 3 } } ], &amp;quot;streamSettings&amp;quot;: { &amp;quot;network&amp;quot;: &amp;quot;kcp&amp;quot;, &amp;quot;kcpSettings&amp;quot;: { &amp;quot;mtu&amp;quot;: 1350, &amp;quot;tti&amp;quot;: 20, &amp;quot;uplinkCapacity&amp;quot;: 5, &amp;quot;downlinkCapacity&amp;quot;: 100, &amp;quot;congestion&amp;quot;: false, &amp;quot;readBufferSize&amp;quot;: 1, &amp;quot;writeBufferSize&amp;quot;: 1, &amp;quot;header&amp;quot;: { &amp;quot;type&amp;quot;: &amp;quot;none&amp;quot; } } }, &amp;quot;outbound&amp;quot;: { &amp;quot;protocol&amp;quot;: &amp;quot;freedom&amp;quot;, &amp;quot;settings&amp;quot;: {} }, &amp;quot;outboundDetour&amp;quot;: [ { &amp;quot;protocol&amp;quot;: &amp;quot;blackhole&amp;quot;, &amp;quot;settings&amp;quot;: {}, &amp;quot;tag&amp;quot;: &amp;quot;blocked&amp;quot; } ], &amp;quot;routing&amp;quot;: { &amp;quot;strategy&amp;quot;: &amp;quot;rules&amp;quot;, &amp;quot;settings&amp;quot;: { &amp;quot;rules&amp;quot;: [ { &amp;quot;type&amp;quot;: &amp;quot;field&amp;quot;, &amp;quot;ip&amp;quot;: [ &amp;quot;0.</description>
+    </item>
     
     <item>
       <title>记一次kicad打开元件封装库卡死cvPCB瞎折腾的过程 其一</title>

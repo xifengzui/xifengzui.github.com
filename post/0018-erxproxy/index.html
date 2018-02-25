@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,height=device-height, user-scalable=no,initial-scale=1, minimum-scale=1, maximum-scale=1,target-densitydpi=device-dpi ">
+<meta name="generator" content="Hugo 0.30.2" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="fonts.lug.ustc.edu.cn/css?family=Roboto:400,700" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/github.min.css">
+<link rel="stylesheet" href="/css/normalize.css">
+<link rel="stylesheet" href="/css/skeleton.css">
+<link rel="stylesheet" href="/css/custom.css">
+<link rel="alternate" href="/index.xml" type="application/rss+xml" title="惜枫醉">
+<title>在EdgeMAX EdgeRouter ERX路由器原生系统上搭建透明代理 - 惜枫醉</title>
+</head>
+<body>
+
+<div class="container">
+
+	<header role="banner">
+		<div class="header-logo">
+			<a href="/"><img src="https://s.gravatar.com/avatar/45de30c48912968eb292222014b646e8?s=200" width="60" height="60" alt="惜枫醉"></a>
+		</div>
+		
+	</header>
+
+
+	<main role="main">
+		<article itemscope itemtype="http://arkis.me/about">
+			<h1 class="entry-title" itemprop="headline">在EdgeMAX EdgeRouter ERX路由器原生系统上搭建透明代理</h1>
+			<span class="entry-meta"><time itemprop="datePublished" datetime="2018-02-25">2018年02月25日</time></span>
+			<section itemprop="entry-text">
+				<p><strong>每个能使用技术达到自己目的的人，都要考虑能否坚持自己的原则，做不到，请不要尝试。</strong></p>
+
+<p>我写这篇文章的主要原因就是方便自己，以后在遇到特殊的情况诸如雷击之类的灾害时，不至于重新再来翻阅资料一遍，如果你有任何问题，可以留言，或者翻阅官方资料，我更推荐官方资料，因为人家资料齐全。我这个教程只通过我手头有的mipsel架构的路由器进行的操作，当然你可以举一反三，自行的架设在其他路由上。</p>
+
+<p>我喜欢翻阅电子技术及互联网技术的相关资料，由于众所周知的原因，在防火墙内访问一些技术站点通常会遇到速度慢或404等问题。之前都是简单的搭建一个\$\$服务让PC可以使用。</p>
+
+<p>现在这次的目的是在家庭里搭建一个网关，让所有的设备包括手机、电脑、PS4等都可以做到无感知访问相关站点，即一劳永逸，避免重复设置。
+方案选择了V2RAY,以下我都用Ray来代替。</p>
+
+<p>Ray相比于其他Chi**DNS  \$\$  -redir  \$\$-tunnel  KCPtun的混合体来说，操作更加简便，当然配置也会相对复杂，不过理解了思路后，会有一种豁然开朗的感觉。事实上我没仔细关它的实现方式,，我大致理解了其逻辑，如果大家有兴趣完全可以参考官方站点搭建灵活的科学实验工具。
+我这里只是简单的按照官方推荐的教程，搭建了家里的透明代理。大约花了我2小时的时间。</p>
+
+<hr />
+
+<p><strong><em>材料</em></strong></p>
+
+<p><strong>1.一台EdgeMax ERX路由器。</strong></p>
+
+<p>这个路由器在2017年我给了她很高很高的评价，作为一个不到300块的路由器，带有POE供电、256M的Flash、256M的RAM，原生debian系统。处理器是MT7621,带硬件转发。我觉得是相当值了，可玩性也非常高。而且重点是它不带无线！我非常喜欢，我就想有个简单可靠的铁盒子放在弱电箱里。</p>
+
+<p><strong>2.一台防火墙外的服务器</strong></p>
+
+<p>给你提供出路。</p>
+
+<p><strong>3.不怕失败的决心。</strong></p>
+
+<hr />
+
+<p><strong><em>操作步骤</em></strong></p>
+
+<p><strong>0.开篇注意事项</strong></p>
+
+<p>服务器时间和路由器时间保持一致，时区没有关系，精确至分钟即可。</p>
+
+<p>确保你的路由器有支持的Ray版本，如果不支持，你可能得下载源码自己编译。</p>
+
+<p>Ray对硬件要求也挺高的，至少需要32M的内存，推荐64M或更多的内存，如果你的内存不足，还是洗洗睡觉吧不要熬夜看ray了，不行的。</p>
+
+<p>如果你配置文件一般在哪里都不知道的话，我建议你查询互联网或者稍微补充一下linux基础，这篇文章可能不适合你。</p>
+
+<p><strong>1.在服务器上搭建Ray。</strong></p>
+
+<p>使用SSH登陆海外linux服务器 运行脚本直接安装。</p>
+
+<pre><code class="language-shell">bash &lt;(curl -L -s https://install.direct/go.sh)
+</code></pre>
+
+<p>使用如下配置文件</p>
+
+<pre><code class="language-json">{
+  &quot;log&quot; : {
+    &quot;access&quot;: &quot;/var/log/v2ray/access.log&quot;,
+    &quot;error&quot;: &quot;/var/log/v2ray/error.log&quot;,
+    &quot;loglevel&quot;: &quot;warning&quot;
+  },
+  &quot;inbound&quot;: {
+    &quot;port&quot;: 443,
+    &quot;protocol&quot;: &quot;vmess&quot;,
+    &quot;settings&quot;: {
+      &quot;clients&quot;: [
+        {
+          &quot;id&quot;: &quot;你自己的UUID&quot;,
+          &quot;level&quot;: 1,
+          &quot;alterId&quot;: 64
+        }
+      ],
+    &quot;detour&quot;: {        
+        &quot;to&quot;: &quot;dynamicPort&quot;   
+      }
+    }
+  },
+&quot;inboundDetour&quot;:[
+    {
+      &quot;protocol&quot;: &quot;vmess&quot;,
+      &quot;port&quot;: &quot;10000-20000&quot;,
+      &quot;tag&quot;: &quot;dynamicPort&quot;,       
+      &quot;settings&quot;: {
+        &quot;default&quot;: {
+          &quot;level&quot;: 1,
+          &quot;alterId&quot;: 32
+        }
+      },
+      &quot;allocate&quot;: {
+        &quot;strategy&quot;: &quot;random&quot;,
+        &quot;concurrency&quot;: 2,
+        &quot;refresh&quot;: 3
+      }
+    }
+  ],
+  &quot;streamSettings&quot;: {
+    &quot;network&quot;: &quot;kcp&quot;,
+    &quot;kcpSettings&quot;: {
+      &quot;mtu&quot;: 1350,
+      &quot;tti&quot;: 20,
+      &quot;uplinkCapacity&quot;: 5,
+      &quot;downlinkCapacity&quot;: 100,
+      &quot;congestion&quot;: false,
+      &quot;readBufferSize&quot;: 1,
+      &quot;writeBufferSize&quot;: 1,
+      &quot;header&quot;: {
+        &quot;type&quot;: &quot;none&quot;
+      }
+    }
+  },
+  &quot;outbound&quot;: {
+    &quot;protocol&quot;: &quot;freedom&quot;,
+    &quot;settings&quot;: {}
+  },
+  &quot;outboundDetour&quot;: [
+    {
+      &quot;protocol&quot;: &quot;blackhole&quot;,
+      &quot;settings&quot;: {},
+      &quot;tag&quot;: &quot;blocked&quot;
+    }
+  ],
+  &quot;routing&quot;: {
+    &quot;strategy&quot;: &quot;rules&quot;,
+    &quot;settings&quot;: {
+      &quot;rules&quot;: [
+        {
+          &quot;type&quot;: &quot;field&quot;,
+          &quot;ip&quot;: [
+            &quot;0.0.0.0/8&quot;,
+            &quot;10.0.0.0/8&quot;,
+            &quot;100.64.0.0/10&quot;,
+            &quot;127.0.0.0/8&quot;,
+            &quot;169.254.0.0/16&quot;,
+            &quot;172.16.0.0/12&quot;,
+            &quot;192.0.0.0/24&quot;,
+            &quot;192.0.2.0/24&quot;,
+            &quot;192.168.0.0/16&quot;,
+            &quot;198.18.0.0/15&quot;,
+            &quot;198.51.100.0/24&quot;,
+            &quot;203.0.113.0/24&quot;,
+            &quot;::1/128&quot;,
+            &quot;fc00::/7&quot;,
+            &quot;fe80::/10&quot;
+          ],
+          &quot;outboundTag&quot;: &quot;blocked&quot;
+        }
+      ]
+    }
+  }
+}
+</code></pre>
+
+<p>注意事项：</p>
+
+<p>​   root权限。</p>
+
+<p>​   如果不支持yum和apt-get，请自行安装unzip和daemon。</p>
+
+<p>​   请务必使用专用的UUID生成工具生成，否则自行修改的UUID很可能有问题。</p>
+
+<p>​   请务必使用诸如VS Code之类的编辑器编辑JSON，否则光是格式上的错误，就够你喝一壶，浪费几小时了。</p>
+
+<p>​   如果想理解这些配置是干啥用的，参考资料中的《官方推荐的白话教程》可能适合你。</p>
+
+<p>​   vps文件传输可以方便的使用lrzsz，不需要安装额外的诸如ftp之类的软件。</p>
+
+<p><strong>2.在路由器上安装Ray</strong></p>
+
+<p>ERX路由比较好的就是有原生的debian，所以这里我们可以直接在ERX安装相应的支持包，不过得先更新一下源。我已经用上了最新的EdgeRouter X 1.10.0。在设置完成可以通过PPPOE上网后，进行如下操作。</p>
+
+<p>2.1 更新源</p>
+
+<p>在2.1系统中我们看到官方的软件包库不见了，所以我们要自己添加源。</p>
+
+<p>使用 ssh 登陆路由器</p>
+
+<p>root权限及编辑sources.list</p>
+
+<pre><code class="language-shell">sudo -i 
+vi /etc/apt/sources.list
+
+</code></pre>
+
+<p>写入软件源</p>
+
+<pre><code class="language-shell">deb http://http.us.debian.org/debian wheezy main contrib non-free 
+</code></pre>
+
+<p>更新软件源</p>
+
+<pre><code class="language-shell">apt-get update
+</code></pre>
+
+<p>这部主要是为了安装unzip和daemon</p>
+
+<pre><code>apt-get install unzip
+apt-get install daemon
+</code></pre>
+
+<p>安装完毕后</p>
+
+<p>有两种方式安装v2ray,一种可以参考本文的第一步直接安装，不过它的脚本判断为mips，并非mipsel，我怕这么安装出问题，所以我选用了本地安装的方式。</p>
+
+<p>这里放一下官方的安装包和脚本，如果是最新版本的话，还是建议到官方去下载，下载链接可以参考参考资料中的官方教程，具体连接我不放了。</p>
+
+<p><a href="http://ojildssc5.bkt.clouddn.com/erx-install.sh">安装脚本</a></p>
+
+<p><a href="http://ojildssc5.bkt.clouddn.com/v2ray-v3.10-linux-mips.zip">mipsel安装包</a></p>
+
+<p>使用WinSCP登陆路由器，进入tmp目录，拖进去安装脚本和mipsel安装包</p>
+
+<pre><code class="language-shell">chmod +x erx-install.sh
+./erx-install.sh -l  ./v2ray-linux-mips.zip
+</code></pre>
+
+<p>一般这么操作，ray就安装完毕了，如果有其他问题可以反馈一下，我没遇到过，这么一搞就安装成功了。</p>
+
+<pre><code>Archive:  v2ray-v3.10-linux-mips.zip
+   creating: /tmp/v2ray/v2ray-v3.10-linux-mips/
+  inflating: /tmp/v2ray/v2ray-v3.10-linux-mips/geoip.dat  
+  inflating: /tmp/v2ray/v2ray-v3.10-linux-mips/geosite.dat  
+  inflating: /tmp/v2ray/v2ray-v3.10-linux-mips/readme.md  
+   creating: /tmp/v2ray/v2ray-v3.10-linux-mips/systemd/
+  inflating: /tmp/v2ray/v2ray-v3.10-linux-mips/systemd/v2ray.service  
+   creating: /tmp/v2ray/v2ray-v3.10-linux-mips/systemv/
+  inflating: /tmp/v2ray/v2ray-v3.10-linux-mips/systemv/v2ray  
+  inflating: /tmp/v2ray/v2ray-v3.10-linux-mips/v2ctl  
+  inflating: /tmp/v2ray/v2ray-v3.10-linux-mips/v2ctl.sig  
+  inflating: /tmp/v2ray/v2ray-v3.10-linux-mips/v2ray  
+  inflating: /tmp/v2ray/v2ray-v3.10-linux-mips/v2ray.sig  
+  inflating: /tmp/v2ray/v2ray-v3.10-linux-mips/vpoint_socks_vmess.json  
+  inflating: /tmp/v2ray/v2ray-v3.10-linux-mips/vpoint_vmess_freedom.json  
+PORT:27016
+UUID:542fbf50-82e7-41ad-8735-0081a3cf9a18
+ Adding system startup for /etc/init.d/v2ray ...
+   /etc/rc0.d/K20v2ray -&gt; ../init.d/v2ray
+   /etc/rc1.d/K20v2ray -&gt; ../init.d/v2ray
+   /etc/rc6.d/K20v2ray -&gt; ../init.d/v2ray
+   /etc/rc2.d/S20v2ray -&gt; ../init.d/v2ray
+   /etc/rc3.d/S20v2ray -&gt; ../init.d/v2ray
+   /etc/rc4.d/S20v2ray -&gt; ../init.d/v2ray
+   /etc/rc5.d/S20v2ray -&gt; ../init.d/v2ray
+V2Ray v3.10 is installed.
+</code></pre>
+
+<p>方便快速。</p>
+
+<p>接下来就是修改配置文件</p>
+
+<p>使用如下配置文件</p>
+
+<pre><code class="language-json">{
+  &quot;log&quot; : {
+    &quot;access&quot;: &quot;/var/log/v2ray/access.log&quot;,
+    &quot;error&quot;: &quot;/var/log/v2ray/error.log&quot;,
+    &quot;loglevel&quot;: &quot;warning&quot;
+  },
+  &quot;inbound&quot;: {
+    &quot;port&quot;: 1080,
+    &quot;protocol&quot;: &quot;socks&quot;,
+    &quot;settings&quot;: {
+      &quot;auth&quot;: &quot;noauth&quot;,
+      &quot;udp&quot;: false,
+      &quot;ip&quot;: &quot;0.0.0.0&quot;
+    }
+  },
+  &quot;inboundDetour&quot;: [
+    {
+      &quot;domainOverride&quot;: [&quot;tls&quot;,&quot;http&quot;],
+      &quot;port&quot;: 你的端口,
+      &quot;protocol&quot;: &quot;dokodemo-door&quot;,
+      &quot;settings&quot;: {
+          &quot;network&quot;: &quot;tcp,udp&quot;,
+          &quot;followRedirect&quot;: true
+      }
+  }
+  ],
+  &quot;streamSettings&quot;: {
+    &quot;network&quot;: &quot;kcp&quot;,
+    &quot;kcpSettings&quot;: {
+      &quot;mtu&quot;: 1350,
+      &quot;tti&quot;: 20,
+      &quot;uplinkCapacity&quot;: 5,
+      &quot;downlinkCapacity&quot;: 100,
+      &quot;congestion&quot;: false,
+      &quot;readBufferSize&quot;: 1,
+      &quot;writeBufferSize&quot;: 1,
+      &quot;header&quot;: {
+        &quot;type&quot;: &quot;none&quot;
+      }
+    }
+  },
+  &quot;outbound&quot;: {
+    &quot;protocol&quot;: &quot;vmess&quot;,
+    &quot;settings&quot;: {
+      &quot;vnext&quot;:[
+        {
+          &quot;address&quot;:&quot;你的VPS IP地址&quot;,
+          &quot;port&quot;: 443,
+          &quot;users&quot;:[
+            {
+              &quot;id&quot;:&quot;你的UUID&quot;,
+              &quot;level&quot;:1,
+              &quot;alterId&quot;:64
+            }
+          ]
+        }
+      ]
+    }
+  },
+  &quot;outboundDetour&quot;: [
+    {
+      &quot;protocol&quot;: &quot;freedom&quot;,
+      &quot;settings&quot;: {},
+      &quot;tag&quot;: &quot;direct&quot;
+    },
+    {
+      &quot;protocol&quot;: &quot;blackhole&quot;,
+      &quot;settings&quot;: {},
+      &quot;tag&quot;: &quot;adblock&quot;
+    }
+  ],
+  &quot;routing&quot;: {
+    &quot;strategy&quot;: &quot;rules&quot;,
+    &quot;settings&quot;: {
+      &quot;domainStrategy&quot;: &quot;IPIfNonMatch&quot;,
+      &quot;rules&quot;: [
+        {
+          &quot;type&quot;: &quot;chinasites&quot;,
+          &quot;outboundTag&quot;: &quot;direct&quot;
+        },
+        {
+          &quot;type&quot;: &quot;chinaip&quot;,
+          &quot;outboundTag&quot;: &quot;direct&quot;
+        },
+        {
+          &quot;domain&quot;: [
+            &quot;tanx.com&quot;,
+            &quot;googeadsserving.cn&quot;,
+            &quot;baidu.com&quot;
+          ],
+          &quot;type&quot;: &quot;field&quot;,
+          &quot;outboundTag&quot;: &quot;adblock&quot;       
+        },
+        {
+          &quot;domain&quot;: [
+            &quot;amazon.com&quot;,
+            &quot;microsoft.com&quot;,
+            &quot;jd.com&quot;,
+            &quot;youku.com&quot;,
+            &quot;baidu.com&quot;
+          ],
+          &quot;type&quot;: &quot;field&quot;,
+          &quot;outboundTag&quot;: &quot;direct&quot;
+        },
+        {
+          &quot;type&quot;: &quot;field&quot;,
+          &quot;ip&quot;: [
+            &quot;0.0.0.0/8&quot;,
+            &quot;10.0.0.0/8&quot;,
+            &quot;100.64.0.0/10&quot;,
+            &quot;127.0.0.0/8&quot;,
+            &quot;169.254.0.0/16&quot;,
+            &quot;172.16.0.0/12&quot;,
+            &quot;192.0.0.0/24&quot;,
+            &quot;192.0.2.0/24&quot;,
+            &quot;192.168.0.0/16&quot;,
+            &quot;198.18.0.0/15&quot;,
+            &quot;198.51.100.0/24&quot;,
+            &quot;203.0.113.0/24&quot;,
+            &quot;::1/128&quot;,
+            &quot;fc00::/7&quot;,
+            &quot;fe80::/10&quot;
+          ],
+          &quot;outboundTag&quot;: &quot;direct&quot;
+        }
+      ]
+    }
+  }
+}
+
+</code></pre>
+
+<p>上面的json中包含了error信息，我建议把这些消息屏蔽掉，毕竟是路由器。</p>
+
+<p>修改好配置文件内容后，拷贝至/etc/v2ray/config.json并重启服务，使用curl测试谷歌访问，如果看到如下信息，就说明你成功了。</p>
+
+<pre><code class="language-shell"> mv /tmp/config.json /etc/v2ray/
+/etc/init.d/v2ray restart
+curl -x socks5://127.0.0.1:1080 google.com
+</code></pre>
+
+<pre><code class="language-html">
+
+&lt;HTML&gt;&lt;HEAD&gt;&lt;meta http-equiv=&quot;content-type&quot; content=&quot;text/html;charset=utf-8&quot;&gt;
+
+&lt;TITLE&gt;301 Moved&lt;/TITLE&gt;&lt;/HEAD&gt;&lt;BODY&gt;
+
+&lt;H1&gt;301 Moved&lt;/H1&gt;
+
+The document has moved
+
+&lt;A HREF=&quot;http://www.google.com/&quot;&gt;here&lt;/A&gt;.
+
+</code></pre>
+
+<p>如果你的配置文件一直都有问题，那么我建议你先不急着上路由器，先在家用电脑上用ray的客户端试试看配置文件。没问题后再上到路由上。一样，如果你想知道这些配置文件做什么的，那么我建议你还是要仔细看下官方的推荐教程，看代码是比较难看懂的。</p>
+
+<p>接下来是几条iptables规则，让路由器内网的流量流入我们的ray。</p>
+
+<pre><code class="language-shell">#!/bin/sh
+
+configIptables() {
+  #tcp iptables rules
+  iptables -t nat -N V2RAY
+  iptables -t nat -N V2RAY_FILTER
+  iptables -t nat -A PREROUTING -p tcp -j V2RAY_FILTER
+  iptables -t nat -A V2RAY_FILTER -d 127.0.0.0/8 -j RETURN
+  iptables -t nat -A V2RAY_FILTER -d 192.168.0.0/16 -j RETURN
+  iptables -t nat -A V2RAY_FILTER -j V2RAY
+  iptables -t nat -A V2RAY -p tcp -j REDIRECT --to-ports 10490
+  
+}
+configIptables
+</code></pre>
+
+<p>以上代码保存为update_iptables 保存到 ERX 的 /config/scripts/post-config.d/ 目录，那样即使设备重启了，iptables也会自动更新。</p>
+
+<p>注意事项：</p>
+
+<p>update_iptables 注意加上可执行权限。</p>
+
+<p>不支持UDP，由于ERX官方iptables不支持TPROXY，所以UDP我这边就没有放上来。目前正在解决中，如果有大神能够指导那是最好的。</p>
+
+<p>UUID服务器和设备上的要一致，再三提醒注意UUID和JSON的格式，一不小心就会在这里遇到问题。</p>
+
+<p>不出意外，这时候配置完成就可以无缝浏览了。</p>
+
+<p>参考资料</p>
+
+<ol>
+<li><a href="https://toutyrater.github.io/">官方推荐的白话教程</a></li>
+<li><a href="https://v2ray.com/">官方教程</a></li>
+</ol>
+
+
+				<span class="ref-txt">原创文章，如需转载引用请注明 "本文章首发于惜枫醉的个人博客: http://arkis.me"</span>
+				
+				
+				<div class ="post-donate">
+					<div id="donate_board" class="donate_bar center">
+						<a id="btn_donate" class="btn_donate" href="javascript:;" title="打赏"></a>
+						<span class="donate_txt">
+						   觉得文章有用的话，请随意打赏。您的支持将鼓励我继续创作！
+						</span>
+						<br>
+					</div>
+
+					<div id="donate_guide" class="donate_bar center hidden" >
+						<form action="https://shenghuo.alipay.com/send/payment/fill.htm"
+							method="POST" target="_blank" accept-charset="GBK">
+							<input name="optEmail" type="hidden" value="359939992@qq.com" />
+							<input name="payAmount" type="hidden" value="1" />
+							<input id="title" name="title" type="hidden" value="打赏惜枫醉的文章" />
+							<input name="memo" type="hidden" value="留下您的大名及联系方式(email,wechat,weibo)，多交流共勉共进。" />
+							<input name="pay" type="image" value="转账"
+								src="https://img.alipay.com/sys/personalprod/style/mc/btn-index.png" />
+						</form>
+
+						
+						<img src="http://ojildssc5.bkt.clouddn.com/alipay_scan_code.jpg" alt="支付宝打赏">
+						
+						<img src="http://ojildssc5.bkt.clouddn.com/wechat_scan_code.jpg" alt="微信打赏">
+						<span class="donate_txt">
+								请简单粗暴地爱我
+						</span>
+					</div>
+					<script type="text/javascript">
+						document.getElementById('btn_donate').onclick = function(){
+							document.getElementById('donate_board').remove(this);
+							document.getElementById('donate_guide').setAttribute("class","donate_bar center");
+						}
+					</script>
+				</div>
+				
+
+				
+				<div id="lv-container" data-id="city" data-uid="MTAyMC8zMTcxMC84Mjc0">
+						<script type="text/javascript">
+					(function(d, s) {
+						var j, e = d.getElementsByTagName(s)[0];
+					
+						if (typeof LivereTower === 'function') { return; }
+					
+						j = d.createElement(s);
+						j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+						j.async = true;
+					
+						e.parentNode.insertBefore(j, e);
+					})(document, 'script');
+						</script>
+					<noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
+				</div>
+				
+			
+			<script type="text/javascript">
+				(function(){
+					var bp = document.createElement('script');
+					var curProtocol = window.location.protocol.split(':')[0];
+					if (curProtocol === 'https') {
+						bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+					}
+					else {
+						bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+					}
+					var s = document.getElementsByTagName("script")[0];
+					s.parentNode.insertBefore(bp, s);
+				})();
+			</script>
+			</section>
+		</article>
+	</main>
+
+
+	<footer role="contentinfo">
+		<div class="hr"></div>
+		<div class="footer-link">
+			<a href="mailto:xifengzui@yeah.net" target="_blank">Email</a>
+			
+			
+			<a href="https://github.com/xifengzui" target="_blank">GitHub</a>
+			<a href="https://www.weibo.com/malermad" target="_blank">微博</a>
+			
+			<a href="/about" target="_blank">关于</a>
+		</div>
+		<div class="copyright">Copyright &copy; 惜枫醉 All rights reserved.</div>
+	</footer>
+
+</div>
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+</body>
+</html>
